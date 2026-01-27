@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import ArtistCard from "./ArtistCard";
 
 const artists = [
   {
+    id: "elena-vance",
     name: "Elena Vance",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200",
     specialty: "Contemporary Urban Landscapes",
@@ -12,6 +14,7 @@ const artists = [
     recentWork: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800",
   },
   {
+    id: "marcus-chen",
     name: "Marcus Chen",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200",
     specialty: "Light & Abstract Forms",
@@ -21,6 +24,7 @@ const artists = [
     recentWork: "https://images.unsplash.com/photo-1549887534-1541e9326642?w=800",
   },
   {
+    id: "yuki-tanaka",
     name: "Yuki Tanaka",
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200",
     specialty: "Mixed Media & Memory",
@@ -30,6 +34,7 @@ const artists = [
     recentWork: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800",
   },
   {
+    id: "sarah-williams",
     name: "Sarah Williams",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200",
     specialty: "Digital Naturalism",
@@ -60,14 +65,17 @@ const ArtistsSection = () => {
               Reputation builds through consistent quality and peer recognition.
             </p>
           </div>
-          <button className="text-sm font-medium text-primary hover:text-primary/80 transition-colors whitespace-nowrap">
+          <Link 
+            to="/discover" 
+            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors whitespace-nowrap"
+          >
             View all artists →
-          </button>
+          </Link>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {artists.map((artist, index) => (
-            <ArtistCard key={index} {...artist} delay={index * 0.1} />
+            <ArtistCard key={artist.id} {...artist} delay={index * 0.1} />
           ))}
         </div>
       </div>

@@ -1,7 +1,9 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, Users, Award } from "lucide-react";
 
 interface ArtistCardProps {
+  id?: string;
   name: string;
   avatar: string;
   specialty: string;
@@ -13,6 +15,7 @@ interface ArtistCardProps {
 }
 
 const ArtistCard = ({
+  id,
   name,
   avatar,
   specialty,
@@ -34,13 +37,16 @@ const ArtistCard = ({
     newcomer: "New Talent",
   };
 
-  return (
+  // Generate id from name if not provided
+  const artistId = id || name.toLowerCase().replace(/\s+/g, "-");
+
+  const CardContent = (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
       viewport={{ once: true }}
-      className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300"
+      className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300 cursor-pointer"
     >
       {/* Background image */}
       <div className="relative h-32 overflow-hidden">
@@ -87,6 +93,12 @@ const ArtistCard = ({
         </div>
       </div>
     </motion.div>
+  );
+
+  return (
+    <Link to={`/artists/${artistId}`}>
+      {CardContent}
+    </Link>
   );
 };
 
