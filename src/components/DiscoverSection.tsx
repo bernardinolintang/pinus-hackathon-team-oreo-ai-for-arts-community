@@ -3,6 +3,8 @@ import ArtworkCard from "./ArtworkCard";
 
 const artworks = [
   {
+    artworkId: "urban-solitude-1",
+    artistId: "elena-vance",
     image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800",
     title: "Urban Solitude",
     artist: "Elena Vance",
@@ -14,6 +16,8 @@ const artworks = [
     keywords: ["urban", "solitude", "contemporary"],
   },
   {
+    artworkId: "morning-light-3",
+    artistId: "marcus-chen",
     image: "https://images.unsplash.com/photo-1549887534-1541e9326642?w=800",
     title: "Morning Light Series III",
     artist: "Marcus Chen",
@@ -24,6 +28,8 @@ const artworks = [
     keywords: ["light", "abstract", "minimalism"],
   },
   {
+    artworkId: "fragments-memory",
+    artistId: "yuki-tanaka",
     image: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800",
     title: "Fragments of Memory",
     artist: "Yuki Tanaka",
@@ -35,6 +41,8 @@ const artworks = [
     keywords: ["memory", "japanese", "mixed media"],
   },
   {
+    artworkId: "digital-botanica",
+    artistId: "sarah-williams",
     image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=800",
     title: "Digital Botanica",
     artist: "Sarah Williams",
@@ -45,6 +53,8 @@ const artworks = [
     keywords: ["digital", "nature", "futurism"],
   },
   {
+    artworkId: "color-study-47",
+    artistId: "james-rivera",
     image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800",
     title: "Color Study No. 47",
     artist: "James Rivera",
@@ -55,6 +65,8 @@ const artworks = [
     keywords: ["color", "study", "expressionism"],
   },
   {
+    artworkId: "stillness-motion",
+    artistId: "anna-kowalski",
     image: "https://images.unsplash.com/photo-1569172122301-bc5008bc09c5?w=800",
     title: "Stillness in Motion",
     artist: "Anna Kowalski",
@@ -69,7 +81,7 @@ const artworks = [
 
 const DiscoverSection = () => {
   return (
-    <section className="py-24 bg-background">
+    <section id="home-discover-section" className="py-24 bg-background">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

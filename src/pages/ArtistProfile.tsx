@@ -10,6 +10,7 @@ import {
   Globe,
   Heart,
   UserPlus,
+  UserMinus,
   ExternalLink,
 } from "lucide-react";
 import Header from "@/components/Header";
@@ -18,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getArtistById, Artist, Endorsement, PortfolioItem } from "@/data/artists";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const reputationConfig = {
   established: {
@@ -46,56 +49,83 @@ const trustScoreConfig = {
   emerging: { label: "Emerging", class: "organic-badge" },
 };
 
-const PortfolioCard = ({ item }: { item: PortfolioItem }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300"
-  >
-    <div className="relative aspect-[4/3] overflow-hidden">
-      <img
-        src={item.image}
-        alt={item.title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="absolute top-3 left-3">
-        <span className={trustScoreConfig[item.trustScore].class}>
-          <Star className="w-3 h-3" />
-          {trustScoreConfig[item.trustScore].label}
-        </span>
-      </div>
-      <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button className="w-9 h-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors">
-          <Heart className="w-4 h-4 text-primary" />
-        </button>
-      </div>
-    </div>
-    <div className="p-4">
-      <h4 className="font-serif text-lg font-semibold mb-2">{item.title}</h4>
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        {item.keywords.slice(0, 3).map((keyword) => (
-          <span
-            key={keyword}
-            className="text-xs px-2 py-0.5 bg-muted rounded text-muted-foreground"
-          >
-            {keyword}
+const PortfolioCard = ({ item, artistId }: { item: PortfolioItem; artistId: string }) => {
+  const { user, isFavorite, toggleFavorite } = useAuth();
+  const isFav = isFavorite(item.id);
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!user) {
+      toast.error("Please sign in to save favorites");
+      return;
+    }
+
+    try {
+      await toggleFavorite(item.id, artistId);
+      toast.success(isFav ? "Removed from favorites" : "Saved to favorites");
+    } catch (error) {
+      toast.error("Failed to update favorite");
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300"
+    >
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute top-3 left-3">
+          <span className={trustScoreConfig[item.trustScore].class}>
+            <Star className="w-3 h-3" />
+            {trustScoreConfig[item.trustScore].label}
           </span>
-        ))}
-      </div>
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <Users className="w-4 h-4" />
-          <span>{item.peerLikes} peers</span>
         </div>
-        <div className="flex items-center gap-1">
-          <Heart className="w-4 h-4" />
-          <span>{item.totalLikes}</span>
+        <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button
+            onClick={handleFavoriteClick}
+            className={`w-9 h-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors ${
+              isFav ? "opacity-100" : ""
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : "text-primary"}`} />
+          </button>
         </div>
       </div>
-    </div>
-  </motion.div>
-);
+      <div className="p-4">
+        <h4 className="font-serif text-lg font-semibold mb-2">{item.title}</h4>
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {item.keywords.slice(0, 3).map((keyword) => (
+            <span
+              key={keyword}
+              className="text-xs px-2 py-0.5 bg-muted rounded text-muted-foreground"
+            >
+              {keyword}
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Users className="w-4 h-4" />
+            <span>{item.peerLikes} peers</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Heart className="w-4 h-4" />
+            <span>{item.totalLikes}</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const EndorsementCard = ({ endorsement }: { endorsement: Endorsement }) => (
   <motion.div
@@ -133,6 +163,24 @@ const EndorsementCard = ({ endorsement }: { endorsement: Endorsement }) => (
 const ArtistProfile = () => {
   const { id } = useParams<{ id: string }>();
   const artist = getArtistById(id || "");
+  const { user, isFollowing, toggleFollow } = useAuth();
+  const isFollowingArtist = isFollowing(artist?.id || "");
+
+  const handleFollowClick = async () => {
+    if (!user) {
+      toast.error("Please sign in to follow artists");
+      return;
+    }
+
+    if (!artist) return;
+
+    try {
+      await toggleFollow(artist.id);
+      toast.success(isFollowingArtist ? "Unfollowed artist" : "Following artist");
+    } catch (error) {
+      toast.error("Failed to update follow status");
+    }
+  };
 
   if (!artist) {
     return (
@@ -222,9 +270,18 @@ const ArtistProfile = () => {
                   </div>
 
                   <div className="flex gap-3">
-                    <Button>
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Follow
+                    <Button onClick={handleFollowClick} variant={isFollowingArtist ? "outline" : "default"}>
+                      {isFollowingArtist ? (
+                        <>
+                          <UserMinus className="w-4 h-4 mr-2" />
+                          Unfollow
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Follow
+                        </>
+                      )}
                     </Button>
                     <Button variant="outline">Message</Button>
                   </div>
@@ -333,7 +390,7 @@ const ArtistProfile = () => {
             <TabsContent value="portfolio">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {artist.portfolio.map((item, index) => (
-                  <PortfolioCard key={item.id} item={item} />
+                  <PortfolioCard key={item.id} item={item} artistId={artist.id} />
                 ))}
               </div>
             </TabsContent>

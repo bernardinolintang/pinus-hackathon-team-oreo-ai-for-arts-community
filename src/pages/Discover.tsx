@@ -24,10 +24,17 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
+// Helper to get artist ID from name
+const getArtistId = (name: string): string => {
+  return name.toLowerCase().replace(/\s+/g, "-");
+};
+
 // Extended artwork data for the discover page
 const allArtworks = [
   {
     id: 1,
+    artworkId: "urban-solitude-1",
+    artistId: "elena-vance",
     image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800",
     title: "Urban Solitude",
     artist: "Elena Vance",
@@ -40,6 +47,8 @@ const allArtworks = [
   },
   {
     id: 2,
+    artworkId: "morning-light-3",
+    artistId: "marcus-chen",
     image: "https://images.unsplash.com/photo-1549887534-1541e9326642?w=800",
     title: "Morning Light Series III",
     artist: "Marcus Chen",
@@ -51,6 +60,8 @@ const allArtworks = [
   },
   {
     id: 3,
+    artworkId: "fragments-memory",
+    artistId: "yuki-tanaka",
     image: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800",
     title: "Fragments of Memory",
     artist: "Yuki Tanaka",
@@ -63,6 +74,8 @@ const allArtworks = [
   },
   {
     id: 4,
+    artworkId: "digital-botanica",
+    artistId: "sarah-williams",
     image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=800",
     title: "Digital Botanica",
     artist: "Sarah Williams",
@@ -74,6 +87,8 @@ const allArtworks = [
   },
   {
     id: 5,
+    artworkId: "color-study-47",
+    artistId: "james-rivera",
     image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800",
     title: "Color Study No. 47",
     artist: "James Rivera",
@@ -85,6 +100,8 @@ const allArtworks = [
   },
   {
     id: 6,
+    artworkId: "stillness-motion",
+    artistId: "anna-kowalski",
     image: "https://images.unsplash.com/photo-1569172122301-bc5008bc09c5?w=800",
     title: "Stillness in Motion",
     artist: "Anna Kowalski",
@@ -97,6 +114,8 @@ const allArtworks = [
   },
   {
     id: 7,
+    artworkId: "whispers-autumn",
+    artistId: "thomas-berg",
     image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800",
     title: "Whispers of Autumn",
     artist: "Thomas Berg",
@@ -109,6 +128,8 @@ const allArtworks = [
   },
   {
     id: 8,
+    artworkId: "geometric-dreams",
+    artistId: "lisa-park",
     image: "https://images.unsplash.com/photo-1515405295579-ba7b45403062?w=800",
     title: "Geometric Dreams",
     artist: "Lisa Park",
@@ -120,6 +141,8 @@ const allArtworks = [
   },
   {
     id: 9,
+    artworkId: "ocean-depths",
+    artistId: "michael-torres",
     image: "https://images.unsplash.com/photo-1482160549825-59d1b23cb208?w=800",
     title: "Ocean Depths",
     artist: "Michael Torres",
@@ -131,6 +154,8 @@ const allArtworks = [
   },
   {
     id: 10,
+    artworkId: "urban-rhythms",
+    artistId: "david-kim",
     image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
     title: "Urban Rhythms",
     artist: "David Kim",
@@ -143,6 +168,8 @@ const allArtworks = [
   },
   {
     id: 11,
+    artworkId: "neon-nights",
+    artistId: "sophie-anderson",
     image: "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=800",
     title: "Neon Nights",
     artist: "Sophie Anderson",
@@ -154,6 +181,8 @@ const allArtworks = [
   },
   {
     id: 12,
+    artworkId: "serene-passage",
+    artistId: "emily-wright",
     image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800",
     title: "Serene Passage",
     artist: "Emily Wright",

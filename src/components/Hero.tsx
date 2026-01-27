@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Users, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Sparkles, Users, Shield, ChevronDown } from "lucide-react";
 
 const Hero = () => {
   return (
@@ -42,30 +41,15 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            A community where art appreciation emerges from genuine peer relationships, 
-            not algorithms. Understand why artworks resonate with people like you.
+            A community where art appreciation emerges from genuine peer relationships,
+            not algorithms. Explore artworks in depth and see how peers interact with them.
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Button size="lg" className="gradient-trust text-primary-foreground px-8 shadow-card hover:shadow-hover transition-shadow">
-              Start Exploring
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-            <Button variant="outline" size="lg" className="px-8">
-              Learn More
-            </Button>
-          </motion.div>
 
           {/* Trust indicators */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8"
           >
             <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-card shadow-soft">
@@ -94,6 +78,21 @@ const Hero = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Scroll indicator to show there is more content below */}
+      <button
+        type="button"
+        onClick={() => {
+          const el = document.getElementById("home-discover-section");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 inline-flex flex-col items-center text-xs text-muted-foreground hover:text-foreground focus:outline-none"
+      >
+        <span className="mb-1 tracking-wide uppercase">Scroll to explore</span>
+        <ChevronDown className="w-5 h-5 animate-bounce" />
+      </button>
     </section>
   );
 };

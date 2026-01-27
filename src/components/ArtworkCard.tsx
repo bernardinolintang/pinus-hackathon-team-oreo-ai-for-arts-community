@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { Heart, MessageCircle, Users, Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface ArtworkCardProps {
+  artworkId: string;
+  artistId: string;
   image: string;
   title: string;
   artist: string;
@@ -15,6 +20,8 @@ interface ArtworkCardProps {
 }
 
 const ArtworkCard = ({
+  artworkId,
+  artistId,
   image,
   title,
   artist,
@@ -26,6 +33,25 @@ const ArtworkCard = ({
   keywords,
   delay = 0,
 }: ArtworkCardProps) => {
+  const { user, isFavorite, toggleFavorite } = useAuth();
+  const isFav = isFavorite(artworkId);
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!user) {
+      toast.error("Please sign in to save favorites");
+      return;
+    }
+
+    try {
+      await toggleFavorite(artworkId, artistId);
+      toast.success(isFav ? "Removed from favorites" : "Saved to favorites");
+    } catch (error) {
+      toast.error("Failed to update favorite");
+    }
+  };
   const trustColors = {
     high: "trust-badge",
     medium: "peer-badge",
@@ -39,19 +65,25 @@ const ArtworkCard = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      viewport={{ once: true }}
-      className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300"
-    >
+    <Link to={`/artwork/${artworkId}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay }}
+        viewport={{ once: true }}
+        className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300 cursor-pointer"
+      >
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <img
           src={image}
           alt={title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            const target = e.currentTarget as HTMLImageElement;
+            target.onerror = null;
+            target.src = "/placeholder.svg";
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
@@ -65,8 +97,13 @@ const ArtworkCard = ({
 
         {/* Quick actions */}
         <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors">
-            <Heart className="w-5 h-5 text-primary" />
+          <button
+            onClick={handleFavoriteClick}
+            className={`w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors ${
+              isFav ? "opacity-100" : ""
+            }`}
+          >
+            <Heart className={`w-5 h-5 ${isFav ? "fill-primary text-primary" : "text-primary"}`} />
           </button>
           <button className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors">
             <MessageCircle className="w-5 h-5 text-muted-foreground" />
@@ -120,6 +157,7 @@ const ArtworkCard = ({
         </div>
       </div>
     </motion.div>
+    </Link>
   );
 };
 

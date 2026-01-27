@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="py-16 bg-card border-t border-border">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full gradient-trust" />
@@ -13,16 +13,6 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground">
               A community-driven art platform built on trust, transparency, and genuine appreciation.
             </p>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4">Discover</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/discover" className="hover:text-foreground transition-colors">Browse Artworks</Link></li>
-              <li><Link to="/artists" className="hover:text-foreground transition-colors">Artists</Link></li>
-              <li><Link to="/collections" className="hover:text-foreground transition-colors">Collections</Link></li>
-              <li><Link to="/trending" className="hover:text-foreground transition-colors">Trending</Link></li>
-            </ul>
           </div>
 
           <div>
