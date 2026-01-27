@@ -66,7 +66,7 @@ const ArtistsSection = () => {
             </p>
           </div>
           <Link 
-            to="/discover" 
+            to="/artists" 
             className="text-sm font-medium text-primary hover:text-primary/80 transition-colors whitespace-nowrap"
           >
             View all artists →

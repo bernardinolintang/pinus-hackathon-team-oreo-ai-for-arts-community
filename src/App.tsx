@@ -7,10 +7,10 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Discover from "./pages/Discover";
-import ArtistProfile from "./pages/ArtistProfile";
-import ArtworkDetail from "./pages/ArtworkDetail";
 import Artists from "./pages/Artists";
 import Community from "./pages/Community";
+import ArtistProfile from "./pages/ArtistProfile";
+import ArtworkDetail from "./pages/ArtworkDetail";
 import About from "./pages/About";
 import Collections from "./pages/Collections";
 import Trending from "./pages/Trending";
@@ -43,9 +43,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/discover" element={<Discover />} />
-            <Route path="/artwork/:id" element={<ArtworkDetail />} />
             <Route path="/artists" element={<Artists />} />
             <Route path="/artists/:id" element={<ArtistProfile />} />
+            <Route path="/artworks/:id" element={<ArtworkDetail />} />
             <Route path="/community" element={<Community />} />
             <Route path="/about" element={<About />} />
             <Route path="/collections" element={<Collections />} />
