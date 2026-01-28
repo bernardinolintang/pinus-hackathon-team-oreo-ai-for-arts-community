@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import DiscoverSection from "@/components/DiscoverSection";
@@ -6,9 +7,23 @@ import ArtistsSection from "@/components/ArtistsSection";
 import PrinciplesSection from "@/components/PrinciplesSection";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import AuthDialog from "@/components/AuthDialog";
 
 const Index = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
+  const handleStartExploring = () => {
+    if (user) {
+      navigate("/discover");
+    } else {
+      setAuthDialogOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -23,16 +38,21 @@ const Index = () => {
           <h2 className="font-serif text-3xl md:text-4xl font-semibold mb-4">
             Loved what you see?
           </h2>
-          <p className="text-muted-foreground mb  -6">
+          <p className="text-muted-foreground mb-6">
             Dive into the full marketplace to explore hundreds of pieces and
             follow the artists that inspire you most.
           </p>
-          <Button asChild size="lg" className="mt-4 gradient-trust text-primary-foreground px-8 shadow-card hover:shadow-hover">
-            <Link to="/discover">Start Exploring</Link>
+          <Button 
+            onClick={handleStartExploring}
+            size="lg" 
+            className="mt-4 gradient-trust text-primary-foreground px-8 shadow-card hover:shadow-hover"
+          >
+            Start Exploring
           </Button>
         </div>
       </section>
       <Footer />
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} defaultTab="signup" />
     </div>
   );
 };

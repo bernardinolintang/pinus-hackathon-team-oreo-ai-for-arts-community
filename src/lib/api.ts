@@ -1,5 +1,6 @@
 // Lovable Cloud API service
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.lovable.dev";
+const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === "true" || !import.meta.env.VITE_API_URL;
 
 export interface User {
   id: string;
@@ -38,10 +39,25 @@ const removeAuthToken = (): void => {
   localStorage.removeItem("auth_token");
 };
 
+// Mock API for development
+const mockApi = {
+  users: new Map<string, { email: string; password: string; name: string; id: string; avatar?: string; bio?: string; createdAt: string }>(),
+  tokens: new Map<string, string>(),
+  followedArtists: new Map<string, Set<string>>(),
+  favoriteArtworks: new Map<string, Set<string>>(),
+  likedArtworks: new Map<string, Set<string>>(),
+  comments: new Map<string, Array<{ id: string; artworkId: string; userId: string; userName: string; userAvatar?: string; text: string; createdAt: string }>>(),
+};
+
 const apiRequest = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
+  // Use mock API in development if real API fails or is not configured
+  if (USE_MOCK_API) {
+    return mockApiRequest<T>(endpoint, options);
+  }
+
   const token = getAuthToken();
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -49,17 +65,201 @@ const apiRequest = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "An error occurred" }));
-    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: "An error occurred" }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    // Fallback to mock API if real API fails (network error, CORS, etc.)
+    if (error instanceof TypeError && (error.message.includes("fetch") || error.message.includes("Failed to fetch"))) {
+      console.warn("API request failed, using mock API for development:", error.message);
+      try {
+        return await mockApiRequest<T>(endpoint, options);
+      } catch (mockError) {
+        throw new Error("Unable to connect to server. Please check your internet connection or try again later.");
+      }
+    }
+    throw error;
+  }
+};
+
+// Mock API implementation
+const mockApiRequest = async <T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> => {
+  const token = getAuthToken();
+  const userId = token ? mockApi.tokens.get(token) : null;
+
+  // Simulate network delay
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  // Auth endpoints
+  if (endpoint === "/auth/signup" && options.method === "POST") {
+    const data = JSON.parse(options.body as string);
+    
+    // Check if user already exists
+    if (mockApi.users.has(data.email)) {
+      throw new Error("An account with this email already exists");
+    }
+    
+    const id = `user_${Date.now()}`;
+    const user = {
+      id,
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      avatar: undefined,
+      bio: undefined,
+      createdAt: new Date().toISOString(),
+    };
+    mockApi.users.set(data.email, user);
+    const authToken = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    mockApi.tokens.set(authToken, id);
+    mockApi.followedArtists.set(id, new Set());
+    mockApi.favoriteArtworks.set(id, new Set());
+    mockApi.likedArtworks.set(id, new Set());
+    return {
+      user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt },
+      token: authToken,
+    } as T;
   }
 
-  return response.json();
+  if (endpoint === "/auth/login" && options.method === "POST") {
+    const data = JSON.parse(options.body as string);
+    const user = mockApi.users.get(data.email);
+    if (!user || user.password !== data.password) {
+      throw new Error("Invalid email or password");
+    }
+    const authToken = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    mockApi.tokens.set(authToken, user.id);
+    return {
+      user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt },
+      token: authToken,
+    } as T;
+  }
+
+  if (endpoint === "/auth/me" && userId) {
+    const user = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!user) throw new Error("User not found");
+    return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt } as T;
+  }
+
+  // User endpoints
+  if (endpoint.startsWith("/users/follow/") && options.method === "POST" && userId) {
+    const artistId = endpoint.split("/").pop()!;
+    const followed = mockApi.followedArtists.get(userId) || new Set();
+    followed.add(artistId);
+    mockApi.followedArtists.set(userId, followed);
+    return undefined as T;
+  }
+
+  if (endpoint.startsWith("/users/unfollow/") && options.method === "DELETE" && userId) {
+    const artistId = endpoint.split("/").pop()!;
+    const followed = mockApi.followedArtists.get(userId);
+    followed?.delete(artistId);
+    return undefined as T;
+  }
+
+  if (endpoint === "/users/following" && userId) {
+    const followed = mockApi.followedArtists.get(userId) || new Set();
+    return Array.from(followed) as T;
+  }
+
+  if (endpoint === "/users/favorites" && options.method === "POST" && userId) {
+    const data = JSON.parse(options.body as string);
+    const favorites = mockApi.favoriteArtworks.get(userId) || new Set();
+    favorites.add(data.artworkId);
+    mockApi.favoriteArtworks.set(userId, favorites);
+    return undefined as T;
+  }
+
+  if (endpoint.startsWith("/users/favorites/") && options.method === "DELETE" && userId) {
+    const artworkId = endpoint.split("/").pop()!;
+    const favorites = mockApi.favoriteArtworks.get(userId);
+    favorites?.delete(artworkId);
+    return undefined as T;
+  }
+
+  if (endpoint === "/users/favorites" && userId) {
+    const favorites = mockApi.favoriteArtworks.get(userId) || new Set();
+    return Array.from(favorites).map((artworkId) => ({ artworkId, artistId: "unknown" })) as T;
+  }
+
+  if (endpoint === "/users/likes" && userId) {
+    const likes = mockApi.likedArtworks.get(userId) || new Set();
+    return Array.from(likes) as T;
+  }
+
+  if (endpoint === "/users/profile" && options.method === "PATCH" && userId) {
+    const data = JSON.parse(options.body as string);
+    const user = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!user) throw new Error("User not found");
+    Object.assign(user, data);
+    return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt } as T;
+  }
+
+  // Artwork endpoints
+  if (endpoint.startsWith("/artworks/") && endpoint.endsWith("/like") && options.method === "POST" && userId) {
+    const artworkId = endpoint.split("/")[2];
+    const likes = mockApi.likedArtworks.get(userId) || new Set();
+    likes.add(artworkId);
+    mockApi.likedArtworks.set(userId, likes);
+    return undefined as T;
+  }
+
+  if (endpoint.startsWith("/artworks/") && endpoint.endsWith("/like") && options.method === "DELETE" && userId) {
+    const artworkId = endpoint.split("/")[2];
+    const likes = mockApi.likedArtworks.get(userId);
+    likes?.delete(artworkId);
+    return undefined as T;
+  }
+
+  if (endpoint.startsWith("/artworks/") && endpoint.endsWith("/comments") && options.method === "POST" && userId) {
+    const artworkId = endpoint.split("/")[2];
+    const data = JSON.parse(options.body as string);
+    const user = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!user) throw new Error("User not found");
+    const comments = mockApi.comments.get(artworkId) || [];
+    const comment = {
+      id: `comment_${Date.now()}`,
+      artworkId,
+      userId: user.id,
+      userName: user.name,
+      userAvatar: user.avatar,
+      text: data.text,
+      createdAt: new Date().toISOString(),
+    };
+    comments.push(comment);
+    mockApi.comments.set(artworkId, comments);
+    return comment as T;
+  }
+
+  if (endpoint.startsWith("/artworks/") && endpoint.includes("/comments") && !endpoint.includes("/comments/") && userId) {
+    const artworkId = endpoint.split("/")[2];
+    const comments = mockApi.comments.get(artworkId) || [];
+    return comments as T;
+  }
+
+  if (endpoint.includes("/comments/") && options.method === "DELETE" && userId) {
+    const parts = endpoint.split("/");
+    const artworkId = parts[2];
+    const commentId = parts[4];
+    const comments = mockApi.comments.get(artworkId) || [];
+    const filtered = comments.filter((c) => c.id !== commentId);
+    mockApi.comments.set(artworkId, filtered);
+    return undefined as T;
+  }
+
+  throw new Error(`Mock API: Endpoint ${endpoint} not implemented`);
 };
 
 export const authApi = {
@@ -130,5 +330,52 @@ export const userApi = {
   getFavoriteArtworks: async (): Promise<Array<{ artworkId: string; artistId: string }>> => {
     return apiRequest<Array<{ artworkId: string; artistId: string }>>("/users/favorites");
   },
+
+  likeArtwork: async (artworkId: string): Promise<void> => {
+    return apiRequest<void>(`/artworks/${artworkId}/like`, {
+      method: "POST",
+    });
+  },
+
+  unlikeArtwork: async (artworkId: string): Promise<void> => {
+    return apiRequest<void>(`/artworks/${artworkId}/like`, {
+      method: "DELETE",
+    });
+  },
+
+  getLikedArtworks: async (): Promise<string[]> => {
+    return apiRequest<string[]>("/users/likes");
+  },
+
+  getArtworkLikes: async (artworkId: string): Promise<{ count: number; isLiked: boolean }> => {
+    return apiRequest<{ count: number; isLiked: boolean }>(`/artworks/${artworkId}/likes`);
+  },
+
+  addComment: async (artworkId: string, text: string): Promise<Comment> => {
+    return apiRequest<Comment>(`/artworks/${artworkId}/comments`, {
+      method: "POST",
+      body: JSON.stringify({ text }),
+    });
+  },
+
+  getComments: async (artworkId: string): Promise<Comment[]> => {
+    return apiRequest<Comment[]>(`/artworks/${artworkId}/comments`);
+  },
+
+  deleteComment: async (artworkId: string, commentId: string): Promise<void> => {
+    return apiRequest<void>(`/artworks/${artworkId}/comments/${commentId}`, {
+      method: "DELETE",
+    });
+  },
 };
+
+export interface Comment {
+  id: string;
+  artworkId: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  text: string;
+  createdAt: string;
+}
 

@@ -3,6 +3,8 @@ import { Heart, MessageCircle, Users, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ArtworkCardProps {
   artworkId: string;
@@ -33,8 +35,10 @@ const ArtworkCard = ({
   keywords,
   delay = 0,
 }: ArtworkCardProps) => {
-  const { user, isFavorite, toggleFavorite } = useAuth();
+  const { user, isFavorite, toggleFavorite, isLiked, toggleLike } = useAuth();
   const isFav = isFavorite(artworkId);
+  const liked = isLiked(artworkId);
+  const [likeCount, setLikeCount] = useState(totalLikes);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,6 +54,23 @@ const ArtworkCard = ({
       toast.success(isFav ? "Removed from favorites" : "Saved to favorites");
     } catch (error) {
       toast.error("Failed to update favorite");
+    }
+  };
+
+  const handleLikeClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!user) {
+      toast.error("Please sign in to like artworks");
+      return;
+    }
+
+    try {
+      await toggleLike(artworkId);
+      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+    } catch (error) {
+      toast.error("Failed to update like");
     }
   };
   const trustColors = {
@@ -79,6 +100,7 @@ const ArtworkCard = ({
           src={image}
           alt={title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
           onError={(e) => {
             const target = e.currentTarget as HTMLImageElement;
             target.onerror = null;
@@ -95,20 +117,35 @@ const ArtworkCard = ({
           </span>
         </div>
 
-        {/* Quick actions */}
-        <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={handleFavoriteClick}
-            className={`w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors ${
-              isFav ? "opacity-100" : ""
-            }`}
-          >
-            <Heart className={`w-5 h-5 ${isFav ? "fill-primary text-primary" : "text-primary"}`} />
-          </button>
-          <button className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors">
-            <MessageCircle className="w-5 h-5 text-muted-foreground" />
-          </button>
-        </div>
+        {/* Quick actions - Only show for logged-in users */}
+        {user && (
+          <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleLikeClick}
+                  className="w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-all hover:scale-110 active:scale-95"
+                >
+                  <Heart className={`w-5 h-5 transition-all ${liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Like this artwork</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleFavoriteClick}
+                  className={`w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-all hover:scale-110 active:scale-95 ${
+                    isFav ? "opacity-100" : ""
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 transition-all ${isFav ? "fill-primary text-primary" : "text-primary"}`} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{isFav ? "Remove from favorites" : "Save to favorites"}</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -151,10 +188,22 @@ const ArtworkCard = ({
             <span>{peerLikes} peers appreciate</span>
           </div>
           <div className="flex items-center gap-1">
-            <Heart className="w-4 h-4" />
-            <span>{totalLikes}</span>
+            <Heart className={`w-4 h-4 ${liked ? "fill-red-500 text-red-500" : ""}`} />
+            <span>{likeCount}</span>
           </div>
         </div>
+        
+        {/* Login prompt for logged-out users */}
+        {!user && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <p className="text-xs text-muted-foreground text-center">
+              <Link to="/login" className="text-primary hover:underline">
+                Sign in
+              </Link>{" "}
+              to like and save artworks
+            </p>
+          </div>
+        )}
       </div>
     </motion.div>
     </Link>
@@ -162,3 +211,4 @@ const ArtworkCard = ({
 };
 
 export default ArtworkCard;
+

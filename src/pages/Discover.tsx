@@ -1,9 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal, X, ChevronDown, Heart, MessageCircle } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArtworkCard from "@/components/ArtworkCard";
+import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -204,12 +206,22 @@ type SortOption = "relevance" | "peer-likes" | "total-likes" | "newest";
 type TrustLevel = "high" | "medium" | "emerging";
 
 const Discover = () => {
+  const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [selectedTrustLevels, setSelectedTrustLevels] = useState<TrustLevel[]>([]);
   const [minPeerLikes, setMinPeerLikes] = useState<number>(0);
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Read search query from URL on mount
+  useEffect(() => {
+    const queryParam = searchParams.get("q");
+    if (queryParam) {
+      setSearchQuery(queryParam);
+    }
+  }, [searchParams]);
 
   const toggleKeyword = (keyword: string) => {
     setSelectedKeywords((prev) =>
@@ -524,6 +536,35 @@ const Discover = () => {
               >
                 Clear all
               </Button>
+            </motion.div>
+          )}
+
+          {/* Sign-in Banner for logged-out users */}
+          {!user && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">Sign in to interact with artworks</p>
+                  <p className="text-sm text-muted-foreground">
+                    Like, save, and comment on your favorite pieces
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" asChild>
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </div>
             </motion.div>
           )}
 

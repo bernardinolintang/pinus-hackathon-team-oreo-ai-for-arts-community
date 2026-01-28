@@ -1,14 +1,18 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, MessageCircle, Users, Star, Share2, Bookmark } from "lucide-react";
+import { ArrowLeft, Heart, MessageCircle, Users, Star, Share2, Bookmark, Send, Trash2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { getArtistById } from "@/data/artists";
+import { userApi, type Comment } from "@/lib/api";
+import { useState, useEffect } from "react";
+import { formatDistanceToNow } from "date-fns";
 
 // Mock artwork data - in real app, this would come from API
 const getArtworkById = (artworkId: string) => {
@@ -91,8 +95,14 @@ const getArtworkById = (artworkId: string) => {
 const ArtworkDetail = () => {
   const { id } = useParams<{ id: string }>();
   const artwork = getArtworkById(id || "");
-  const { user, isFavorite, toggleFavorite, isFollowing, toggleFollow } = useAuth();
+  const { user, isFavorite, toggleFavorite, isFollowing, toggleFollow, isLiked, toggleLike, addComment, deleteComment } = useAuth();
   const artist = artwork ? getArtistById(artwork.artistId) : null;
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [likeCount, setLikeCount] = useState(artwork?.totalLikes || 0);
+  const liked = artwork ? isLiked(artwork.artworkId) : false;
 
   if (!artwork) {
     return (
@@ -115,12 +125,34 @@ const ArtworkDetail = () => {
     );
   }
 
-  const isFav = isFavorite(artwork.artworkId);
-  const isFollowingArtist = artist ? isFollowing(artwork.artistId) : false;
+  // Load comments on mount
+  useEffect(() => {
+    if (artwork) {
+      loadComments();
+    }
+  }, [artwork?.artworkId]);
+
+  const loadComments = async () => {
+    if (!artwork) return;
+    setLoadingComments(true);
+    try {
+      const fetchedComments = await userApi.getComments(artwork.artworkId);
+      setComments(fetchedComments);
+    } catch (error) {
+      console.error("Failed to load comments:", error);
+      // For demo purposes, use empty array if API fails
+      setComments([]);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const isFav = artwork ? isFavorite(artwork.artworkId) : false;
+  const isFollowingArtist = artist && artwork ? isFollowing(artwork.artistId) : false;
   
   // Calculate peer percentage (mock calculation - in real app, this would come from API)
   const totalPeerConnections = 18; // Mock: total peers in user's network
-  const peerPercentage = totalPeerConnections > 0 
+  const peerPercentage = artwork && totalPeerConnections > 0 
     ? Math.round((artwork.peerLikes / totalPeerConnections) * 100) 
     : 0;
 
@@ -156,13 +188,64 @@ const ArtworkDetail = () => {
       return;
     }
 
-    if (!artist) return;
+    if (!artist || !artwork) return;
 
     try {
       await toggleFollow(artwork.artistId);
       toast.success(isFollowingArtist ? "Unfollowed artist" : "Following artist");
     } catch (error) {
       toast.error("Failed to update follow status");
+    }
+  };
+
+  const handleLikeClick = async () => {
+    if (!user) {
+      toast.error("Please sign in to like artworks");
+      return;
+    }
+
+    if (!artwork) return;
+
+    try {
+      await toggleLike(artwork.artworkId);
+      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+      toast.success(liked ? "Removed like" : "Liked artwork");
+    } catch (error) {
+      toast.error("Failed to update like");
+    }
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please sign in to comment");
+      return;
+    }
+
+    if (!artwork || !commentText.trim()) return;
+
+    setSubmittingComment(true);
+    try {
+      const newComment = await addComment(artwork.artworkId, commentText.trim());
+      setComments((prev) => [newComment, ...prev]);
+      setCommentText("");
+      toast.success("Comment added");
+    } catch (error) {
+      toast.error("Failed to add comment");
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!artwork) return;
+    
+    try {
+      await deleteComment(artwork.artworkId, commentId);
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+      toast.success("Comment deleted");
+    } catch (error) {
+      toast.error("Failed to delete comment");
     }
   };
 
@@ -245,18 +328,39 @@ const ArtworkDetail = () => {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3 mb-6">
-                  <Button
-                    variant={isFav ? "default" : "outline"}
-                    onClick={handleFavoriteClick}
-                    className="flex-1"
-                  >
-                    <Heart className={`w-4 h-4 mr-2 ${isFav ? "fill-current" : ""}`} />
-                    {isFav ? "Saved" : "Save"}
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Share
-                  </Button>
+                  {user ? (
+                    <>
+                      <Button
+                        variant={liked ? "default" : "outline"}
+                        onClick={handleLikeClick}
+                        className="flex-1"
+                      >
+                        <Heart className={`w-4 h-4 mr-2 ${liked ? "fill-current" : ""}`} />
+                        {liked ? "Liked" : "Like"} ({likeCount})
+                      </Button>
+                      <Button
+                        variant={isFav ? "default" : "outline"}
+                        onClick={handleFavoriteClick}
+                        className="flex-1"
+                      >
+                        <Heart className={`w-4 h-4 mr-2 ${isFav ? "fill-current" : ""}`} />
+                        {isFav ? "Saved" : "Save"}
+                      </Button>
+                      <Button variant="outline" className="flex-1">
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="w-full p-4 bg-muted rounded-lg text-center">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Sign in to like, save, and comment on artworks
+                      </p>
+                      <Link to="/login">
+                        <Button size="sm">Sign In</Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -289,7 +393,7 @@ const ArtworkDetail = () => {
                       <div className="text-xs text-muted-foreground">Peer Likes</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-serif text-2xl font-semibold">{artwork.totalLikes}</div>
+                      <div className="font-serif text-2xl font-semibold">{likeCount}</div>
                       <div className="text-xs text-muted-foreground">Total Likes</div>
                     </div>
                     <div className="text-center">
@@ -341,6 +445,94 @@ const ArtworkDetail = () => {
                   <p className="italic">"{artwork.peerNote}"</p>
                 </div>
               )}
+
+              {/* Comments Section */}
+              <div className="bg-card rounded-xl p-6 border border-border">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Comments ({comments.length})
+                </h3>
+
+                {/* Comment Form - Only for logged-in users */}
+                {user ? (
+                  <form onSubmit={handleCommentSubmit} className="mb-6">
+                    <div className="flex gap-3">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <Textarea
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                          placeholder="Add a comment..."
+                          rows={3}
+                          className="mb-2"
+                          disabled={submittingComment}
+                        />
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={!commentText.trim() || submittingComment}
+                        >
+                          <Send className="w-4 h-4 mr-2" />
+                          {submittingComment ? "Posting..." : "Post Comment"}
+                        </Button>
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="mb-6 p-4 bg-muted rounded-lg text-center">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Sign in to join the conversation
+                    </p>
+                    <Link to="/login">
+                      <Button size="sm">Sign In</Button>
+                    </Link>
+                  </div>
+                )}
+
+                {/* Comments List */}
+                {loadingComments ? (
+                  <div className="text-center py-8 text-muted-foreground">Loading comments...</div>
+                ) : comments.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No comments yet. Be the first to comment!
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {comments.map((comment) => (
+                      <div key={comment.id} className="flex gap-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={comment.userAvatar} alt={comment.userName} />
+                          <AvatarFallback>{comment.userName[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-1">
+                            <div>
+                              <p className="font-medium text-sm">{comment.userName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                              </p>
+                            </div>
+                            {user && user.id === comment.userId && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteComment(comment.id)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="w-4 h-4 text-muted-foreground" />
+                              </Button>
+                            )}
+                          </div>
+                          <p className="text-sm">{comment.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { getArtistById } from "@/data/artists";
 import { motion } from "framer-motion";
@@ -33,18 +34,24 @@ const Favorites = () => {
               </CardHeader>
               <CardContent>
                 {favorites.length === 0 ? (
-                  <div className="text-center py-16">
-                    <Heart className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                    <h3 className="font-serif text-xl font-semibold mb-2">No favorites yet</h3>
-                    <p className="text-muted-foreground mb-6">
-                      Start exploring and save artworks you love!
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-20"
+                  >
+                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                      <Heart className="w-12 h-12 text-primary/60" />
+                    </div>
+                    <h3 className="font-serif text-2xl font-semibold mb-3">No favorites yet</h3>
+                    <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                      Start exploring and save artworks you love! Your saved pieces will appear here.
                     </p>
                     <Link to="/discover">
-                      <button className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity">
+                      <Button size="lg" className="px-8">
                         Discover Artworks
-                      </button>
+                      </Button>
                     </Link>
-                  </div>
+                  </motion.div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {favorites.map((favorite) => (

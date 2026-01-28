@@ -34,10 +34,10 @@ const Signup = () => {
 
     try {
       await signup(email, password, name);
-      toast.success("Account created successfully!");
+      toast.success("Account created successfully! Welcome to Atelier!");
+      // Navigation happens in AuthContext after signup
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to create account");
-    } finally {
       setLoading(false);
     }
   };
