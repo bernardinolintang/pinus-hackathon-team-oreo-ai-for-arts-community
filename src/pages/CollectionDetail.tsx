@@ -5,12 +5,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { getCollectionById } from "@/data/collections";
 import { format } from "date-fns";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const collection = id ? getCollectionById(id) : undefined;
+
+  useDocumentTitle(collection?.title ?? "Collection");
 
   if (!collection) {
     return <Navigate to="/collections" replace />;
@@ -33,21 +37,22 @@ const CollectionDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         <div className="container mx-auto px-6 max-w-4xl">
-          {/* Back link */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mb-6"
-          >
-            <Link to="/collections">
-              <Button variant="ghost" size="sm" className="gap-2 -ml-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to collections
-              </Button>
-            </Link>
-          </motion.div>
+          {/* Breadcrumbs */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/collections">Collections</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
           {/* Hero */}
           <motion.div

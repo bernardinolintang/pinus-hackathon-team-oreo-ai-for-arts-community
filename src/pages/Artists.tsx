@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Search, BadgeCheck } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -21,6 +22,7 @@ const artistCards = artists.map((a) => ({
 }));
 
 export default function Artists() {
+  useDocumentTitle("Artists");
   const [search, setSearch] = useState("");
   const [reputationFilter, setReputationFilter] = useState<ReputationFilter>("all");
 
@@ -44,7 +46,7 @@ export default function Artists() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         <section className="py-16 md:py-20 border-b border-border">
           <div className="container mx-auto px-6">
             <motion.div

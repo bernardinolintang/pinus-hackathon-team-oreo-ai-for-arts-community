@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -21,11 +22,13 @@ export default function ArtistProfile() {
     enabled: !!artistId,
   });
 
+  useDocumentTitle(artist?.name ?? "Artist");
+
   if (!artistId) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="pt-24 pb-16">
+        <main id="main-content" className="pt-24 pb-16">
           <div className="container mx-auto px-6 text-center py-16">
             <h1 className="font-serif text-3xl font-semibold mb-4">No artist selected</h1>
             <Link to="/discover">
@@ -45,7 +48,7 @@ export default function ArtistProfile() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="pt-24 pb-16">
+        <main id="main-content" className="pt-24 pb-16">
           <div className="container mx-auto px-6">
             <div className="h-8 w-48 bg-muted rounded animate-pulse mb-8" />
             <div className="flex gap-6 mb-8">
@@ -74,7 +77,7 @@ export default function ArtistProfile() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="pt-24 pb-16">
+        <main id="main-content" className="pt-24 pb-16">
           <div className="container mx-auto px-6 text-center py-16">
             <h1 className="font-serif text-3xl font-semibold mb-4">Artist not found</h1>
             <p className="text-muted-foreground mb-6">
@@ -97,7 +100,7 @@ export default function ArtistProfile() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           <ArtistHeader artist={artist} showBackLink />
             <div className="mt-4 flex justify-end">

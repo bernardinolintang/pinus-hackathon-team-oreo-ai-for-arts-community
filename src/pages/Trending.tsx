@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { TrendingUp, Clock, Sparkles, Users, Hash } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -23,6 +24,7 @@ const timeframeOptions: { value: Timeframe; label: string; icon: React.ReactNode
 ];
 
 const Trending = () => {
+  useDocumentTitle("Trending");
   const [timeframe, setTimeframe] = useState<Timeframe>("week");
   const [activeTab, setActiveTab] = useState("artworks");
 
@@ -44,7 +46,7 @@ const Trending = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           {/* Header */}
           <motion.div

@@ -266,7 +266,7 @@ const NotificationsDropdown = ({
         {localNotifications.length > 0 && (
           <div className="border-t bg-muted/20 px-3 py-2">
             <Link
-              to="/discover"
+              to="/notifications"
               onClick={() => setIsOpen(false)}
               className="block w-full rounded-lg py-2 text-center text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             >

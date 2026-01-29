@@ -1,46 +1,90 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
-import { getArtistById } from "@/data/artists";
+import ArtworkCard from "@/components/ArtworkCard";
+import { Bookmark, Loader2 } from "lucide-react";
+import { userApi } from "@/lib/api";
+import { getArtworkById } from "@/data/artworks";
+import type { ArtworkDetailItem } from "@/data/artworks";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const Favorites = () => {
   const { user } = useAuth();
+  const [artworks, setArtworks] = useState<ArtworkDetailItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // In a real app, you'd fetch this from the API
-  // For now, we'll show a placeholder
-  const favorites: Array<{ artworkId: string; artistId: string; title: string; image: string; artistName: string }> = [];
+  useDocumentTitle("My Favorites");
 
-  // This would be populated from the API response
-  // For demo purposes, we'll show an empty state or fetch from artists data
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    userApi
+      .getFavoriteArtworks()
+      .then((list) => {
+        if (cancelled) return;
+        const resolved = list
+          .map((f) => getArtworkById(f.artworkId))
+          .filter((a): a is ArtworkDetailItem => a != null);
+        setArtworks(resolved);
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e?.message ?? "Failed to load favorites");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-background">
         <Header />
-        <div className="pt-24 pb-16 px-6">
-          <div className="container mx-auto max-w-6xl">
+        <main id="main-content" className="pt-24 pb-16">
+          <div className="container mx-auto px-6 max-w-6xl">
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl font-serif flex items-center gap-2">
-                  <Heart className="w-6 h-6" />
+                  <Bookmark className="w-6 h-6" />
                   My Favorites
                 </CardTitle>
                 <CardDescription>Artworks you've saved for later</CardDescription>
               </CardHeader>
               <CardContent>
-                {favorites.length === 0 ? (
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                    <Loader2 className="w-12 h-12 animate-spin mb-4" aria-hidden />
+                    <p>Loading your favorites…</p>
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-20">
+                    <p className="text-muted-foreground mb-4">{error}</p>
+                    <Button variant="outline" onClick={() => window.location.reload()}>
+                      Try again
+                    </Button>
+                  </div>
+                ) : artworks.length === 0 ? (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center py-20"
                   >
                     <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                      <Heart className="w-12 h-12 text-primary/60" />
+                      <Bookmark className="w-12 h-12 text-primary/60" />
                     </div>
                     <h3 className="font-serif text-2xl font-semibold mb-3">No favorites yet</h3>
                     <p className="text-muted-foreground mb-8 max-w-md mx-auto">
@@ -54,36 +98,33 @@ const Favorites = () => {
                   </motion.div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {favorites.map((favorite) => (
-                      <motion.div
-                        key={favorite.artworkId}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300"
-                      >
-                        <div className="relative aspect-[4/3] overflow-hidden">
-                          <img
-                            src={favorite.image}
-                            alt={favorite.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <div className="p-4">
-                          <h3 className="font-serif text-lg font-semibold mb-1">{favorite.title}</h3>
-                          <p className="text-sm text-muted-foreground">{favorite.artistName}</p>
-                        </div>
-                      </motion.div>
+                    {artworks.map((artwork, index) => (
+                      <ArtworkCard
+                        key={artwork.artworkId}
+                        artworkId={artwork.artworkId}
+                        artistId={artwork.artistId}
+                        image={artwork.image}
+                        title={artwork.title}
+                        artist={artwork.artist}
+                        artistAvatar={artwork.artistAvatar}
+                        peerLikes={artwork.peerLikes}
+                        totalLikes={artwork.totalLikes}
+                        trustScore={artwork.trustScore}
+                        peerNote={artwork.peerNote}
+                        keywords={artwork.keywords}
+                        delay={index * 0.05}
+                      />
                     ))}
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
-        </div>
+        </main>
+        <Footer />
       </div>
     </ProtectedRoute>
   );
 };
 
 export default Favorites;
-

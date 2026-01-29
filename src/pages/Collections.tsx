@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -31,6 +32,7 @@ const sortOptions = [
 ];
 
 const Collections = () => {
+  useDocumentTitle("Collections");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTheme, setSelectedTheme] = useState("All");
   const [selectedMood, setSelectedMood] = useState("All");
@@ -139,7 +141,7 @@ const Collections = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           {/* Header */}
           <motion.div

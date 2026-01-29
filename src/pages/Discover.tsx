@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, X, ChevronDown, Heart, MessageCircle } from "lucide-react";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { Search, SlidersHorizontal, X, ChevronDown, Heart, Bookmark, MessageCircle } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -206,6 +207,7 @@ type SortOption = "relevance" | "peer-likes" | "total-likes" | "newest";
 type TrustLevel = "high" | "medium" | "emerging";
 
 const Discover = () => {
+  useDocumentTitle("Discover");
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -407,7 +409,7 @@ const Discover = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           {/* Page Header */}
           <motion.div
@@ -548,7 +550,7 @@ const Discover = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-primary" />
+                  <Bookmark className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium">Sign in to interact with artworks</p>

@@ -1,12 +1,14 @@
 import { useParams, Link } from "react-router-dom";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, MessageCircle, Users, Star, Share2, Send, Trash2 } from "lucide-react";
+import { ArrowLeft, Heart, Bookmark, MessageCircle, Users, Star, Share2, Send, Trash2 } from "lucide-react";
 import { ReportDialog } from "@/components/ReportDialog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -19,6 +21,7 @@ import { formatDistanceToNow } from "date-fns";
 const ArtworkDetail = () => {
   const { id } = useParams<{ id: string }>();
   const artwork = getArtworkById(id || "");
+  useDocumentTitle(artwork?.title ?? "Artwork");
   const { user, isFavorite, toggleFavorite, isFollowing, toggleFollow, isLiked, toggleLike, addComment, deleteComment } = useAuth();
   const artist = artwork ? getArtistById(artwork.artistId) : null;
   const [comments, setComments] = useState<Comment[]>([]);
@@ -32,7 +35,7 @@ const ArtworkDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="pt-24 pb-16">
+        <main id="main-content" className="pt-24 pb-16">
           <div className="container mx-auto px-6 text-center py-16">
             <h1 className="font-serif text-3xl font-semibold mb-4">Artwork Not Found</h1>
             <p className="text-muted-foreground mb-6">The artwork you're looking for doesn't exist.</p>
@@ -173,20 +176,55 @@ const ArtworkDetail = () => {
     }
   };
 
+  const handleShareClick = async () => {
+    const url = window.location.href;
+    const title = artwork?.title ?? "Artwork";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+        toast.success("Link shared");
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied to clipboard");
+      }
+    } catch (e) {
+      if ((e as Error).name !== "AbortError") {
+        await navigator.clipboard.writeText(url).catch(() => {});
+        toast.success("Link copied to clipboard");
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         <div className="container mx-auto px-6">
-          {/* Back Button */}
-          <Link
-            to="/discover"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Discover
-          </Link>
+          {/* Breadcrumbs */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/discover">Discover</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                {artist ? (
+                  <BreadcrumbLink asChild>
+                    <Link to={`/artists/${artwork.artistId}`}>{artwork.artist}</Link>
+                  </BreadcrumbLink>
+                ) : (
+                  <span>{artwork.artist}</span>
+                )}
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{artwork.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             {/* Image Section - sticky so it stays fixed while scrolling the content */}
@@ -202,6 +240,7 @@ const ArtworkDetail = () => {
                     src={artwork.image}
                     alt={artwork.title}
                     className="w-full h-full object-contain"
+                    loading="lazy"
                     onError={(e) => {
                       const target = e.currentTarget as HTMLImageElement;
                       target.onerror = null;
@@ -269,10 +308,10 @@ const ArtworkDetail = () => {
                         onClick={handleFavoriteClick}
                         className="flex-1"
                       >
-                        <Heart className={`w-4 h-4 mr-2 ${isFav ? "fill-current" : ""}`} />
+                        <Bookmark className={`w-4 h-4 mr-2 ${isFav ? "fill-current" : ""}`} />
                         {isFav ? "Saved" : "Save"}
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button variant="outline" className="flex-1" onClick={handleShareClick}>
                         <Share2 className="w-4 h-4 mr-2" />
                         Share
                       </Button>

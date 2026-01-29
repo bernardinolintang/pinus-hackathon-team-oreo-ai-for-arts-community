@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, Users, Star } from "lucide-react";
+import { Heart, Bookmark, MessageCircle, Users, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -139,7 +139,7 @@ const ArtworkCard = ({
                     isFav ? "opacity-100" : ""
                   }`}
                 >
-                  <Heart className={`w-5 h-5 transition-all ${isFav ? "fill-primary text-primary" : "text-primary"}`} />
+                  <Bookmark className={`w-5 h-5 transition-all ${isFav ? "fill-primary text-primary" : "text-primary"}`} />
                 </button>
               </TooltipTrigger>
               <TooltipContent>{isFav ? "Remove from favorites" : "Save to favorites"}</TooltipContent>
@@ -156,8 +156,9 @@ const ArtworkCard = ({
         <div className="flex items-center gap-2 mb-4">
           <img
             src={artistAvatar}
-            alt={artist}
+            alt={`${artist} avatar`}
             className="w-6 h-6 rounded-full object-cover"
+            loading="lazy"
           />
           <span className="text-sm text-muted-foreground">{artist}</span>
         </div>

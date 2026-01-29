@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import {
   Users,
   Shield,
@@ -48,11 +49,12 @@ const principles = [
 ];
 
 export default function Community() {
+  useDocumentTitle("Community");
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         {/* Hero */}
         <section className="py-16 md:py-24 border-b border-border">
           <div className="container mx-auto px-6">

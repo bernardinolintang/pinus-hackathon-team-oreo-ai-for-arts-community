@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search, Bell, User, LogOut, Settings, Heart, Menu, X } from "lucide-react";
+import { Search, Bell, User, LogOut, Settings, Bookmark, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import SearchDialog from "@/components/SearchDialog";
@@ -26,6 +27,7 @@ import AuthDialog from "@/components/AuthDialog";
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
@@ -37,18 +39,22 @@ const Header = () => {
     }
   };
 
-  // Keyboard shortcut: Cmd/Ctrl + K to open search
+  // Keyboard shortcuts: Cmd/Ctrl + K search, Cmd/Ctrl + Shift + H home
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setSearchOpen(true);
       }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "H") {
+        e.preventDefault();
+        navigate("/");
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [navigate]);
 
   const getInitials = (name: string) => {
     return name
@@ -166,7 +172,7 @@ const Header = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/favorites" className="cursor-pointer">
-                    <Heart className="mr-2 h-4 w-4" />
+                    <Bookmark className="mr-2 h-4 w-4" />
                     Favorites
                   </Link>
                 </DropdownMenuItem>

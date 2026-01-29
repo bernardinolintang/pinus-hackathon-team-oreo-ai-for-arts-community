@@ -16,11 +16,13 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Community</h4>
+            <h4 className="font-semibold mb-4">Community & Trust</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link to="/community" className="hover:text-foreground transition-colors">Community</Link></li>
               <li><Link to="/guidelines" className="hover:text-foreground transition-colors">Guidelines</Link></li>
               <li><Link to="/trust" className="hover:text-foreground transition-colors">Trust & Safety</Link></li>
               <li><Link to="/moderation" className="hover:text-foreground transition-colors">Moderation</Link></li>
+              <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
               <li><Link to="/faq" className="hover:text-foreground transition-colors">FAQ</Link></li>
             </ul>
           </div>
