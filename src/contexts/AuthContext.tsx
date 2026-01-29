@@ -6,9 +6,10 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
+  signup: (email: string, password: string, name: string, registerAsArtist?: boolean) => Promise<void>;
   logout: () => void;
   updateUser: (data: Partial<User>) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   isFollowing: (artistId: string) => boolean;
   toggleFollow: (artistId: string) => Promise<void>;
   isFavorite: (artworkId: string) => boolean;
@@ -89,8 +90,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     navigate("/discover");
   };
 
-  const signup = async (email: string, password: string, name: string) => {
-    const response = await authApi.signup({ email, password, name });
+  const signup = async (email: string, password: string, name: string, registerAsArtist?: boolean) => {
+    const response = await authApi.signup({ email, password, name, registerAsArtist });
     setUser(response.user);
     
     // Load user data
@@ -119,6 +120,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const updateUser = async (data: Partial<User>) => {
     const updatedUser = await authApi.updateProfile(data);
     setUser(updatedUser);
+  };
+
+  const deleteAccount = async () => {
+    await authApi.deleteAccount();
+    setUser(null);
+    setFollowedArtists(new Set());
+    setFavoriteArtworks(new Set());
+    setLikedArtworks(new Set());
+    navigate("/");
   };
 
   const isFollowing = (artistId: string) => {
@@ -218,6 +228,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         signup,
         logout,
         updateUser,
+        deleteAccount,
         isFollowing,
         toggleFollow,
         isFavorite,

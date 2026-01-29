@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,15 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import Header from "@/components/Header";
+import { Palette } from "lucide-react";
 
-const Signup = () => {
+const SignupArtist = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +33,8 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      await signup(email, password, name);
-      toast.success("Account created successfully! Welcome to Atelier!");
+      await signup(email, password, name, true);
+      toast.success("Account created! Your artist request has been sent for moderator approval. We'll notify you once approved.");
       // Navigation happens in AuthContext after signup
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to create account");
@@ -48,8 +48,13 @@ const Signup = () => {
       <div className="flex items-center justify-center pt-32 pb-16 px-6">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-serif">Create an account</CardTitle>
-            <CardDescription>Sign up to start exploring art and connecting with artists</CardDescription>
+            <div className="flex items-center gap-2">
+              <Palette className="w-6 h-6 text-primary" />
+              <CardTitle className="text-2xl font-serif">Register as an artist</CardTitle>
+            </div>
+            <CardDescription>
+              Create an account and submit a request to become an artist. A moderator will review and approve your request. Once approved, you can post artworks and see who liked and commented on your work.
+            </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
@@ -104,19 +109,14 @@ const Signup = () => {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Creating account..." : "Sign up"}
+                {loading ? "Creating account..." : "Register as artist"}
               </Button>
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">Or</span>
-                </div>
-              </div>
-              <Button type="button" variant="outline" className="w-full" asChild>
-                <Link to="/signup/artist">Register as an artist</Link>
-              </Button>
+              <p className="text-sm text-center text-muted-foreground">
+                Want a regular account instead?{" "}
+                <Link to="/signup" className="text-primary hover:underline">
+                  Sign up without artist request
+                </Link>
+              </p>
               <p className="text-sm text-center text-muted-foreground">
                 Already have an account?{" "}
                 <Link to="/login" className="text-primary hover:underline">
@@ -131,5 +131,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
-
+export default SignupArtist;

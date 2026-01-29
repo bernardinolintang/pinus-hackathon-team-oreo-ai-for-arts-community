@@ -2,6 +2,9 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.lovable.dev";
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === "true" || !import.meta.env.VITE_API_URL;
 
+export type UserRole = "user" | "artist";
+export type ArtistApplicationStatus = "pending" | "approved" | "rejected";
+
 export interface User {
   id: string;
   email: string;
@@ -9,6 +12,8 @@ export interface User {
   avatar?: string;
   bio?: string;
   createdAt: string;
+  role?: UserRole;
+  artistApplicationStatus?: ArtistApplicationStatus;
 }
 
 export interface AuthResponse {
@@ -25,6 +30,15 @@ export interface SignupData {
   email: string;
   password: string;
   name: string;
+  registerAsArtist?: boolean;
+}
+
+export interface ArtistApplication {
+  userId: string;
+  email: string;
+  name: string;
+  appliedAt: string;
+  status: ArtistApplicationStatus;
 }
 
 const getAuthToken = (): string | null => {
@@ -42,8 +56,26 @@ const removeAuthToken = (): void => {
 // Mock API for development - state is persisted to localStorage so your session survives refresh
 const MOCK_STATE_KEY = "atelier_mock_state";
 
-type MockUser = { email: string; password: string; name: string; id: string; avatar?: string; bio?: string; createdAt: string };
+type MockUser = {
+  email: string;
+  password: string;
+  name: string;
+  id: string;
+  avatar?: string;
+  bio?: string;
+  createdAt: string;
+  role?: UserRole;
+  artistApplicationStatus?: ArtistApplicationStatus;
+};
 type MockComment = { id: string; artworkId: string; userId: string; userName: string; userAvatar?: string; text: string; createdAt: string };
+export interface MockArtistArtwork {
+  id: string;
+  artistId: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  createdAt: string;
+}
 
 interface PersistedMockState {
   users: MockUser[];
@@ -52,6 +84,7 @@ interface PersistedMockState {
   favoriteArtworks: Record<string, string[]>;
   likedArtworks: Record<string, string[]>;
   comments: Record<string, MockComment[]>;
+  artistArtworks: Record<string, MockArtistArtwork[]>;
 }
 
 const mockApi = {
@@ -61,6 +94,7 @@ const mockApi = {
   favoriteArtworks: new Map<string, Set<string>>(),
   likedArtworks: new Map<string, Set<string>>(),
   comments: new Map<string, MockComment[]>(),
+  artistArtworks: new Map<string, MockArtistArtwork[]>(),
 };
 
 function saveMockState(): void {
@@ -78,6 +112,9 @@ function saveMockState(): void {
         Array.from(mockApi.likedArtworks.entries()).map(([k, v]) => [k, Array.from(v)])
       ),
       comments: Object.fromEntries(mockApi.comments),
+      artistArtworks: Object.fromEntries(
+        Array.from(mockApi.artistArtworks.entries()).map(([k, v]) => [k, v])
+      ),
     };
     localStorage.setItem(MOCK_STATE_KEY, JSON.stringify(state));
   } catch (e) {
@@ -110,10 +147,16 @@ function loadMockState(): void {
     Object.entries(state.comments || {}).forEach(([artworkId, arr]) =>
       mockApi.comments.set(artworkId, arr)
     );
+    mockApi.artistArtworks.clear();
+    Object.entries(state.artistArtworks || {}).forEach(([userId, arr]) =>
+      mockApi.artistArtworks.set(userId, arr)
+    );
   } catch (e) {
     console.warn("Failed to load mock auth state:", e);
   }
 }
+
+export const MODERATOR_EMAIL = "denxifenn@gmail.com";
 
 // Restore mock state on load so existing auth_token is recognized
 loadMockState();
@@ -181,7 +224,8 @@ const mockApiRequest = async <T>(
     }
     
     const id = `user_${Date.now()}`;
-    const user = {
+    const registerAsArtist = !!data.registerAsArtist;
+    const user: MockUser = {
       id,
       email: data.email,
       password: data.password,
@@ -189,6 +233,8 @@ const mockApiRequest = async <T>(
       avatar: undefined,
       bio: undefined,
       createdAt: new Date().toISOString(),
+      role: registerAsArtist ? "user" : "user",
+      artistApplicationStatus: registerAsArtist ? "pending" : undefined,
     };
     mockApi.users.set(data.email, user);
     const authToken = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -196,9 +242,10 @@ const mockApiRequest = async <T>(
     mockApi.followedArtists.set(id, new Set());
     mockApi.favoriteArtworks.set(id, new Set());
     mockApi.likedArtworks.set(id, new Set());
+    if (registerAsArtist) mockApi.artistArtworks.set(id, []);
     saveMockState();
     return {
-      user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt },
+      user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt, role: user.role, artistApplicationStatus: user.artistApplicationStatus },
       token: authToken,
     } as T;
   }
@@ -213,7 +260,7 @@ const mockApiRequest = async <T>(
     mockApi.tokens.set(authToken, user.id);
     saveMockState();
     return {
-      user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt },
+      user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt, role: user.role, artistApplicationStatus: user.artistApplicationStatus },
       token: authToken,
     } as T;
   }
@@ -221,7 +268,7 @@ const mockApiRequest = async <T>(
   if (endpoint === "/auth/me" && userId) {
     const user = Array.from(mockApi.users.values()).find((u) => u.id === userId);
     if (!user) throw new Error("User not found");
-    return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt } as T;
+    return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt, role: user.role, artistApplicationStatus: user.artistApplicationStatus } as T;
   }
 
   // User endpoints
@@ -280,7 +327,121 @@ const mockApiRequest = async <T>(
     if (!user) throw new Error("User not found");
     Object.assign(user, data);
     saveMockState();
-    return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt } as T;
+    return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt, role: user.role, artistApplicationStatus: user.artistApplicationStatus } as T;
+  }
+
+  // Moderator: list pending artist applications (only denxifenn@gmail.com)
+  if (endpoint === "/moderation/artist-applications" && options.method === "GET" && userId) {
+    const currentUser = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!currentUser || currentUser.email !== MODERATOR_EMAIL) {
+      throw new Error("Forbidden");
+    }
+    const pending = Array.from(mockApi.users.values())
+      .filter((u) => u.artistApplicationStatus === "pending")
+      .map((u) => ({ userId: u.id, email: u.email, name: u.name, appliedAt: u.createdAt, status: u.artistApplicationStatus } as ArtistApplication));
+    return pending as T;
+  }
+
+  // Moderator: approve artist application
+  if (endpoint.startsWith("/moderation/artist-applications/") && endpoint.endsWith("/approve") && options.method === "POST" && userId) {
+    const currentUser = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!currentUser || currentUser.email !== MODERATOR_EMAIL) {
+      throw new Error("Forbidden");
+    }
+    const targetUserId = endpoint.split("/")[3];
+    const target = Array.from(mockApi.users.values()).find((u) => u.id === targetUserId);
+    if (!target || target.artistApplicationStatus !== "pending") {
+      throw new Error("Application not found or already processed");
+    }
+    target.role = "artist";
+    target.artistApplicationStatus = "approved";
+    if (!mockApi.artistArtworks.has(targetUserId)) mockApi.artistArtworks.set(targetUserId, []);
+    saveMockState();
+    return undefined as T;
+  }
+
+  // Moderator: reject artist application
+  if (endpoint.startsWith("/moderation/artist-applications/") && endpoint.endsWith("/reject") && options.method === "POST" && userId) {
+    const currentUser = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!currentUser || currentUser.email !== MODERATOR_EMAIL) {
+      throw new Error("Forbidden");
+    }
+    const targetUserId = endpoint.split("/")[3];
+    const target = Array.from(mockApi.users.values()).find((u) => u.id === targetUserId);
+    if (!target || target.artistApplicationStatus !== "pending") {
+      throw new Error("Application not found or already processed");
+    }
+    target.artistApplicationStatus = "rejected";
+    saveMockState();
+    return undefined as T;
+  }
+
+  // Artist: create artwork (only artists)
+  if (endpoint === "/artworks" && options.method === "POST" && userId) {
+    const currentUser = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!currentUser || currentUser.role !== "artist") {
+      throw new Error("Only approved artists can post artworks");
+    }
+    const data = JSON.parse(options.body as string);
+    const id = `artist_artwork_${userId}_${Date.now()}`;
+    const artwork: MockArtistArtwork = {
+      id,
+      artistId: userId,
+      title: data.title || "Untitled",
+      description: data.description || "",
+      imageUrl: data.imageUrl || "",
+      createdAt: new Date().toISOString(),
+    };
+    const list = mockApi.artistArtworks.get(userId) || [];
+    list.push(artwork);
+    mockApi.artistArtworks.set(userId, list);
+    saveMockState();
+    return artwork as T;
+  }
+
+  // Artist: list my artworks
+  if (endpoint === "/users/me/artworks" && options.method === "GET" && userId) {
+    const list = mockApi.artistArtworks.get(userId) || [];
+    return list as T;
+  }
+
+  // Get likers for an artwork (for artist viewing their own artwork)
+  if (endpoint.startsWith("/artworks/") && endpoint.endsWith("/likers") && userId) {
+    const artworkId = endpoint.split("/")[2];
+    const likers: { userId: string; name: string; email: string }[] = [];
+    mockApi.likedArtworks.forEach((artworkIds, uid) => {
+      if (artworkIds.has(artworkId)) {
+        const u = Array.from(mockApi.users.values()).find((x) => x.id === uid);
+        if (u) likers.push({ userId: u.id, name: u.name, email: u.email });
+      }
+    });
+    return likers as T;
+  }
+
+  // Get single artwork by id (for artist-created artworks)
+  if (endpoint.startsWith("/artworks/") && options.method === "GET" && !endpoint.includes("/like") && !endpoint.includes("/comments") && !endpoint.endsWith("/likers")) {
+    const artworkId = endpoint.split("/")[2];
+    if (artworkId?.startsWith("artist_artwork_")) {
+      for (const [, list] of mockApi.artistArtworks) {
+        const found = list.find((a) => a.id === artworkId);
+        if (found) return found as T;
+      }
+      throw new Error("Artwork not found");
+    }
+  }
+
+  if (endpoint === "/users/account" && options.method === "DELETE" && userId) {
+    const user = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!user) throw new Error("User not found");
+    mockApi.users.delete(user.email);
+    Array.from(mockApi.tokens.entries())
+      .filter(([, id]) => id === userId)
+      .forEach(([t]) => mockApi.tokens.delete(t));
+    mockApi.followedArtists.delete(userId);
+    mockApi.favoriteArtworks.delete(userId);
+    mockApi.likedArtworks.delete(userId);
+    saveMockState();
+    return undefined as T;
   }
 
   // Artwork endpoints
@@ -380,6 +541,11 @@ export const authApi = {
       body: JSON.stringify(data),
     });
   },
+
+  deleteAccount: async (): Promise<void> => {
+    await apiRequest<void>("/users/account", { method: "DELETE" });
+    removeAuthToken();
+  },
 };
 
 export const userApi = {
@@ -451,6 +617,42 @@ export const userApi = {
     return apiRequest<void>(`/artworks/${artworkId}/comments/${commentId}`, {
       method: "DELETE",
     });
+  },
+
+  getMyArtworks: async (): Promise<MockArtistArtwork[]> => {
+    return apiRequest<MockArtistArtwork[]>("/users/me/artworks", { method: "GET" });
+  },
+
+  createArtwork: async (data: { title: string; description: string; imageUrl: string }): Promise<MockArtistArtwork> => {
+    return apiRequest<MockArtistArtwork>("/artworks", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  getArtworkLikers: async (artworkId: string): Promise<{ userId: string; name: string; email: string }[]> => {
+    return apiRequest<{ userId: string; name: string; email: string }[]>(`/artworks/${artworkId}/likers`, { method: "GET" });
+  },
+
+  getArtistArtworkById: async (artworkId: string): Promise<MockArtistArtwork | null> => {
+    if (!artworkId.startsWith("artist_artwork_")) return null;
+    try {
+      return await apiRequest<MockArtistArtwork>(`/artworks/${artworkId}`, { method: "GET" });
+    } catch {
+      return null;
+    }
+  },
+};
+
+export const moderationApi = {
+  getArtistApplications: async (): Promise<ArtistApplication[]> => {
+    return apiRequest<ArtistApplication[]>("/moderation/artist-applications", { method: "GET" });
+  },
+  approveArtistApplication: async (userId: string): Promise<void> => {
+    return apiRequest<void>(`/moderation/artist-applications/${userId}/approve`, { method: "POST" });
+  },
+  rejectArtistApplication: async (userId: string): Promise<void> => {
+    return apiRequest<void>(`/moderation/artist-applications/${userId}/reject`, { method: "POST" });
   },
 };
 

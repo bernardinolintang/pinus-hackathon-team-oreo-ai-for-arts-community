@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import DiscoverSection from "@/components/DiscoverSection";
@@ -10,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import AuthDialog from "@/components/AuthDialog";
+import { Plus } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Index = () => {
   const { user } = useAuth();
@@ -27,6 +30,26 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Header />
+      {/* Artist shortcut: add artwork */}
+      {user?.role === "artist" && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.25 }}
+          className="fixed bottom-6 right-6 z-40"
+        >
+          <Button
+            asChild
+            size="icon"
+            className="h-14 w-14 rounded-full shadow-card hover:shadow-hover gradient-trust text-primary-foreground hover:opacity-95 transition-all"
+            aria-label="Add artwork"
+          >
+            <Link to="/artist/dashboard?post=1">
+              <Plus className="w-7 h-7" />
+            </Link>
+          </Button>
+        </motion.div>
+      )}
       <Hero />
       <DiscoverSection />
       <RecommendationSection />

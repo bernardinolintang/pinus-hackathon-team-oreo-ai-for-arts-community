@@ -35,7 +35,10 @@ const Cookies = lazy(() => import("./pages/Cookies"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
+const SignupArtist = lazy(() => import("./pages/SignupArtist"));
 const Profile = lazy(() => import("./pages/Profile"));
+const EditProfile = lazy(() => import("./pages/EditProfile"));
+const ArtistDashboard = lazy(() => import("./pages/ArtistDashboard"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 
@@ -85,7 +88,10 @@ const App = () => (
             <Route path="/settings" element={<Suspense fallback={<PageFallback />}><Settings /></Suspense>} />
             <Route path="/login" element={<Suspense fallback={<PageFallback />}><Login /></Suspense>} />
             <Route path="/signup" element={<Suspense fallback={<PageFallback />}><Signup /></Suspense>} />
+            <Route path="/signup/artist" element={<Suspense fallback={<PageFallback />}><SignupArtist /></Suspense>} />
             <Route path="/profile" element={<Suspense fallback={<PageFallback />}><Profile /></Suspense>} />
+            <Route path="/profile/edit" element={<Suspense fallback={<PageFallback />}><EditProfile /></Suspense>} />
+            <Route path="/artist/dashboard" element={<Suspense fallback={<PageFallback />}><ArtistDashboard /></Suspense>} />
             <Route path="/favorites" element={<Suspense fallback={<PageFallback />}><Favorites /></Suspense>} />
             <Route path="/notifications" element={<Suspense fallback={<PageFallback />}><Notifications /></Suspense>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -14,22 +14,79 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { getArtistById } from "@/data/artists";
 import { getArtworkById } from "@/data/artworks";
+import type { ArtworkDetailItem } from "@/data/artworks";
 import { userApi, type Comment } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
+import type { MockArtistArtwork } from "@/lib/api";
 
 const ArtworkDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const artwork = getArtworkById(id || "");
+  const isArtistArtwork = (id || "").startsWith("artist_artwork_");
+  const [artistArtwork, setArtistArtwork] = useState<MockArtistArtwork | null | undefined>(undefined); // undefined = loading, null = not found
+  const staticArtwork = !isArtistArtwork ? getArtworkById(id || "") : null;
+  const artwork: ArtworkDetailItem | null = staticArtwork ?? (artistArtwork
+    ? ({
+        artworkId: artistArtwork.id,
+        artistId: artistArtwork.artistId,
+        image: artistArtwork.imageUrl,
+        title: artistArtwork.title,
+        artist: "Artist",
+        artistAvatar: "",
+        peerLikes: 0,
+        totalLikes: 0,
+        totalViews: 0,
+        trustScore: "emerging",
+        peerNote: undefined,
+        keywords: [],
+        description: artistArtwork.description || "",
+        year: new Date().getFullYear(),
+        medium: "",
+        dimensions: "",
+      } as ArtworkDetailItem)
+    : null);
+
   useDocumentTitle(artwork?.title ?? "Artwork");
   const { user, isFavorite, toggleFavorite, isFollowing, toggleFollow, isLiked, toggleLike, addComment, deleteComment } = useAuth();
-  const artist = artwork ? getArtistById(artwork.artistId) : null;
+  const artist = artwork && !isArtistArtwork ? getArtistById(artwork.artistId) : null;
+  const isOwnArtwork = !!artwork && isArtistArtwork && user?.id === artwork.artistId;
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
   const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
-  const [likeCount, setLikeCount] = useState(artwork?.totalLikes || 0);
+  const [likeCount, setLikeCount] = useState(artwork?.totalLikes ?? 0);
+  const [likers, setLikers] = useState<{ userId: string; name: string; email: string }[]>([]);
   const liked = artwork ? isLiked(artwork.artworkId) : false;
+
+  useEffect(() => {
+    if (isArtistArtwork && id) {
+      setArtistArtwork(undefined);
+      userApi.getArtistArtworkById(id)
+        .then((a) => { setArtistArtwork(a ?? null); })
+        .catch(() => setArtistArtwork(null));
+    }
+  }, [id, isArtistArtwork]);
+
+  useEffect(() => {
+    if (isOwnArtwork && artwork?.artworkId) {
+      userApi.getArtworkLikers(artwork.artworkId).then((list) => {
+        setLikers(list);
+        setLikeCount(list.length);
+      }).catch(() => { setLikers([]); setLikeCount(0); });
+    }
+  }, [isOwnArtwork, artwork?.artworkId]);
+
+  if (isArtistArtwork && artistArtwork === undefined) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main id="main-content" className="pt-24 pb-16 flex items-center justify-center">
+          <div className="animate-pulse text-muted-foreground">Loading artwork…</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!artwork) {
     return (
@@ -136,6 +193,12 @@ const ArtworkDetail = () => {
     try {
       await toggleLike(artwork.artworkId);
       setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+      if (isOwnArtwork) {
+        userApi.getArtworkLikers(artwork.artworkId).then((list) => {
+          setLikers(list);
+          setLikeCount(list.length);
+        }).catch(() => {});
+      }
       toast.success(liked ? "Removed like" : "Liked artwork");
     } catch (error) {
       toast.error("Failed to update like");
@@ -247,12 +310,14 @@ const ArtworkDetail = () => {
                       target.src = "/placeholder.svg";
                     }}
                   />
-                  <div className="absolute top-4 left-4">
-                    <span className={trustColors[artwork.trustScore]}>
-                      <Star className="w-3 h-3" />
-                      {trustLabels[artwork.trustScore]}
-                    </span>
-                  </div>
+                  {!isArtistArtwork && (
+                    <div className="absolute top-4 left-4">
+                      <span className={trustColors[artwork.trustScore]}>
+                        <Star className="w-3 h-3" />
+                        {trustLabels[artwork.trustScore]}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -270,24 +335,50 @@ const ArtworkDetail = () => {
                 
                 {/* Artist Info */}
                 <div className="flex items-center gap-4 mb-6">
-                  <Link to={`/artists/${artwork.artistId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={artwork.artistAvatar} alt={artwork.artist} />
-                      <AvatarFallback>{artwork.artist[0]}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{artwork.artist}</p>
-                      <p className="text-sm text-muted-foreground">Artist</p>
+                  {isOwnArtwork && user ? (
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-sm text-muted-foreground">Your artwork</p>
+                      </div>
                     </div>
-                  </Link>
-                  {user && artist && (
-                    <Button
-                      variant={isFollowingArtist ? "outline" : "default"}
-                      size="sm"
-                      onClick={handleFollowClick}
-                    >
-                      {isFollowingArtist ? "Following" : "Follow"}
-                    </Button>
+                  ) : artist ? (
+                    <>
+                      <Link to={`/artists/${artwork.artistId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage src={artwork.artistAvatar} alt={artwork.artist} />
+                          <AvatarFallback>{artwork.artist[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{artwork.artist}</p>
+                          <p className="text-sm text-muted-foreground">Artist</p>
+                        </div>
+                      </Link>
+                      {user && (
+                        <Button
+                          variant={isFollowingArtist ? "outline" : "default"}
+                          size="sm"
+                          onClick={handleFollowClick}
+                        >
+                          {isFollowingArtist ? "Following" : "Follow"}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={artwork.artistAvatar} alt={artwork.artist} />
+                        <AvatarFallback>{artwork.artist[0]}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{artwork.artist}</p>
+                        <p className="text-sm text-muted-foreground">Artist</p>
+                      </div>
+                    </div>
                   )}
                 </div>
 
@@ -334,7 +425,30 @@ const ArtworkDetail = () => {
                 </div>
               </div>
 
-              {/* Peer Interaction Stats */}
+              {/* Who liked this (artist only) */}
+              {isOwnArtwork && (
+                <div className="bg-card rounded-xl p-6 border border-border">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Who liked this ({likers.length})
+                  </h3>
+                  {likers.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No likes yet.</p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {likers.map((l) => (
+                        <li key={l.userId} className="flex items-center gap-3 text-sm">
+                          <span className="font-medium">{l.name}</span>
+                          <span className="text-muted-foreground">{l.email}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
+              {/* Peer Interaction Stats (only for non-artist artworks) */}
+              {!isArtistArtwork && (
               <div className="bg-card rounded-xl p-6 border border-border">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
                   <Users className="w-5 h-5" />
@@ -373,6 +487,7 @@ const ArtworkDetail = () => {
                   </div>
                 </div>
               </div>
+              )}
 
               {/* Description */}
               <div>
@@ -380,7 +495,8 @@ const ArtworkDetail = () => {
                 <p className="text-muted-foreground leading-relaxed">{artwork.description}</p>
               </div>
 
-              {/* Details */}
+              {/* Details (only for non-artist artworks with full metadata) */}
+              {!isArtistArtwork && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Year</p>
@@ -395,8 +511,10 @@ const ArtworkDetail = () => {
                   <p className="font-medium">{artwork.dimensions}</p>
                 </div>
               </div>
+              )}
 
-              {/* Keywords */}
+              {/* Keywords (only for non-artist artworks) */}
+              {!isArtistArtwork && artwork.keywords.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-3">Tags</h3>
                 <div className="flex flex-wrap gap-2">
@@ -407,9 +525,10 @@ const ArtworkDetail = () => {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Peer Note */}
-              {artwork.peerNote && (
+              {!isArtistArtwork && artwork.peerNote && (
                 <div className="bg-secondary/50 rounded-xl p-4 border border-border">
                   <p className="text-sm text-muted-foreground mb-2">Peer Note</p>
                   <p className="italic">"{artwork.peerNote}"</p>

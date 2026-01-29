@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search, Bell, User, LogOut, Settings, Bookmark, Menu, X } from "lucide-react";
+import { Search, Bell, User, LogOut, Settings, Bookmark, Menu, X, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -182,6 +182,12 @@ const Header = () => {
                     Settings
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/moderation" className="cursor-pointer">
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    Moderation
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -295,6 +301,13 @@ const Header = () => {
                       className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                     >
                       Settings
+                    </Link>
+                    <Link
+                      to="/moderation"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                    >
+                      Moderation
                     </Link>
                     <Button
                       variant="ghost"

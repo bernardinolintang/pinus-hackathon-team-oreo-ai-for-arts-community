@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Scale, Flag, Eye, RefreshCw, Mail, FileText, CheckCircle2 } from "lucide-react";
+import { Scale, Flag, Eye, RefreshCw, Mail, FileText, CheckCircle2, Palette, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
+import { moderationApi, MODERATOR_EMAIL, type ArtistApplication } from "@/lib/api";
 
 const sections = [
   {
@@ -62,9 +64,51 @@ function saveAppeal(payload: { caseReference?: string; description: string }) {
 }
 
 const Moderation = () => {
+  const { user } = useAuth();
   const [caseReference, setCaseReference] = useState("");
   const [appealDescription, setAppealDescription] = useState("");
   const [appealSubmitting, setAppealSubmitting] = useState(false);
+  const [artistApplications, setArtistApplications] = useState<ArtistApplication[]>([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const isModerator = user?.email === MODERATOR_EMAIL;
+
+  useEffect(() => {
+    if (isModerator) {
+      setApplicationsLoading(true);
+      moderationApi
+        .getArtistApplications()
+        .then(setArtistApplications)
+        .catch(() => toast.error("Failed to load artist applications"))
+        .finally(() => setApplicationsLoading(false));
+    }
+  }, [isModerator, user?.id]);
+
+  const handleApprove = async (userId: string) => {
+    setProcessingId(userId);
+    try {
+      await moderationApi.approveArtistApplication(userId);
+      setArtistApplications((prev) => prev.filter((a) => a.userId !== userId));
+      toast.success("Artist application approved.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to approve");
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleReject = async (userId: string) => {
+    setProcessingId(userId);
+    try {
+      await moderationApi.rejectArtistApplication(userId);
+      setArtistApplications((prev) => prev.filter((a) => a.userId !== userId));
+      toast.success("Artist application rejected.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to reject");
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   const handleAppealSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +145,54 @@ const Moderation = () => {
             <p className="text-muted-foreground mb-6">
               Learn how content is reviewed and how we handle reports from the community. Ethical moderation helps keep Atelier a place for meaningful interaction and trust.
             </p>
+
+            {/* Artist applications (moderator only) */}
+            {isModerator && (
+              <div className="mb-10 p-6 rounded-2xl bg-card border border-border">
+                <h2 className="font-serif text-xl font-semibold mb-2 flex items-center gap-2">
+                  <Palette className="w-5 h-5 text-primary" />
+                  Artist applications
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Approve or reject requests from users who want to register as artists. Approved users can post artworks and see who liked and commented on their work.
+                </p>
+                {applicationsLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading…</p>
+                ) : artistApplications.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No pending artist applications.</p>
+                ) : (
+                  <ul className="space-y-3">
+                    {artistApplications.map((app) => (
+                      <li key={app.userId} className="flex items-center justify-between gap-4 p-3 rounded-lg border border-border bg-muted/30">
+                        <div>
+                          <p className="font-medium">{app.name}</p>
+                          <p className="text-sm text-muted-foreground">{app.email}</p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <Button
+                            size="sm"
+                            onClick={() => handleApprove(app.userId)}
+                            disabled={processingId !== null}
+                          >
+                            <Check className="w-4 h-4 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleReject(app.userId)}
+                            disabled={processingId !== null}
+                          >
+                            <X className="w-4 h-4 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
 
             {/* Our principles */}
             <div className="mb-10 p-6 rounded-2xl bg-card border border-border">
