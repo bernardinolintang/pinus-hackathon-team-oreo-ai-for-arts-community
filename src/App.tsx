@@ -16,6 +16,7 @@ import ArtistProfile from "./pages/ArtistProfile";
 import ArtworkDetail from "./pages/ArtworkDetail";
 import About from "./pages/About";
 import Collections from "./pages/Collections";
+import CollectionDetail from "./pages/CollectionDetail";
 import Trending from "./pages/Trending";
 import Guidelines from "./pages/Guidelines";
 import Trust from "./pages/Trust";
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/community" element={<Community />} />
             <Route path="/about" element={<About />} />
             <Route path="/collections" element={<Collections />} />
+            <Route path="/collections/:id" element={<CollectionDetail />} />
             <Route path="/trending" element={<Trending />} />
             <Route path="/guidelines" element={<Guidelines />} />
             <Route path="/trust" element={<Trust />} />

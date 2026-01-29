@@ -16,6 +16,8 @@ export interface Collection {
   peerEndorsements: number;
   createdAt: string;
   curator: CollectionCurator;
+  /** Optional images of featured works in this collection (for detail page) */
+  featuredImages?: string[];
 }
 
 export const themes = [
@@ -53,6 +55,12 @@ export const collections: Collection[] = [
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
       verified: true,
     },
+    featuredImages: [
+      "https://images.unsplash.com/photo-1558591710-4b4a1ae0f2d1?w=400",
+      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400",
+      "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400",
+      "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400",
+    ],
   },
   {
     id: "whispers-of-nature",
@@ -70,6 +78,12 @@ export const collections: Collection[] = [
       avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
       verified: true,
     },
+    featuredImages: [
+      "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+      "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400",
+    ],
   },
   {
     id: "abstract-horizons",
@@ -87,6 +101,12 @@ export const collections: Collection[] = [
       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
       verified: true,
     },
+    featuredImages: [
+      "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400",
+      "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400",
+      "https://images.unsplash.com/photo-1515405295579-ba7b45403062?w=400",
+      "https://images.unsplash.com/photo-1558591710-4b4a1ae0f2d1?w=400",
+    ],
   },
   {
     id: "urban-dreams",
@@ -104,6 +124,12 @@ export const collections: Collection[] = [
       avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
       verified: true,
     },
+    featuredImages: [
+      "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=400",
+      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400",
+      "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400",
+      "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=400",
+    ],
   },
   {
     id: "human-condition",
@@ -121,6 +147,12 @@ export const collections: Collection[] = [
       avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
       verified: true,
     },
+    featuredImages: [
+      "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+    ],
   },
   {
     id: "quiet-moments",
@@ -138,5 +170,15 @@ export const collections: Collection[] = [
       avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100",
       verified: true,
     },
+    featuredImages: [
+      "https://images.unsplash.com/photo-1515405295579-ba7b45403062?w=400",
+      "https://images.unsplash.com/photo-1558591710-4b4a1ae0f2d1?w=400",
+      "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400",
+      "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400",
+    ],
   },
 ];
+
+export function getCollectionById(id: string): Collection | undefined {
+  return collections.find((c) => c.id === id);
+}
