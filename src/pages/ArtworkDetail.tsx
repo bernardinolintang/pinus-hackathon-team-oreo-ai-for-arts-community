@@ -10,87 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { getArtistById } from "@/data/artists";
+import { getArtworkById } from "@/data/artworks";
 import { userApi, type Comment } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
-
-// Mock artwork data - in real app, this would come from API
-const getArtworkById = (artworkId: string) => {
-  const allArtworks = [
-    {
-      artworkId: "urban-solitude-1",
-      artistId: "elena-vance",
-      image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=1200",
-      title: "Urban Solitude",
-      artist: "Elena Vance",
-      artistAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
-      peerLikes: 12,
-      totalLikes: 234,
-      totalViews: 1250,
-      trustScore: "high" as const,
-      peerNote: "The emotional depth here reminds me of early Hopper work",
-      keywords: ["urban", "solitude", "contemporary", "cityscape"],
-      description: "A contemplative exploration of urban isolation, capturing the quiet moments between the chaos of city life. This piece invites viewers to reflect on the spaces we inhabit and the emotions they evoke.",
-      year: 2023,
-      medium: "Oil on Canvas",
-      dimensions: "36 × 48 inches",
-    },
-    {
-      artworkId: "morning-light-3",
-      artistId: "marcus-chen",
-      image: "https://images.unsplash.com/photo-1549887534-1541e9326642?w=1200",
-      title: "Morning Light Series III",
-      artist: "Marcus Chen",
-      artistAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
-      peerLikes: 8,
-      totalLikes: 156,
-      totalViews: 890,
-      trustScore: "medium" as const,
-      keywords: ["light", "abstract", "minimalism", "series"],
-      description: "Part of an ongoing series exploring the interplay between light and geometric forms. This piece captures the delicate balance of morning illumination through abstract composition.",
-      year: 2024,
-      medium: "Acrylic on Canvas",
-      dimensions: "24 × 30 inches",
-    },
-    {
-      artworkId: "fragments-memory",
-      artistId: "yuki-tanaka",
-      image: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=1200",
-      title: "Fragments of Memory",
-      artist: "Yuki Tanaka",
-      artistAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
-      peerLikes: 5,
-      totalLikes: 89,
-      totalViews: 450,
-      trustScore: "emerging" as const,
-      peerNote: "A fresh perspective on traditional Japanese aesthetics",
-      keywords: ["memory", "japanese", "mixed media", "cultural"],
-      description: "Drawing from Japanese heritage, this mixed media work explores the fragile nature of memory and the beauty of impermanence through layered textures and cultural symbolism.",
-      year: 2024,
-      medium: "Mixed Media",
-      dimensions: "20 × 28 inches",
-    },
-    {
-      artworkId: "digital-botanica",
-      artistId: "sarah-williams",
-      image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=1200",
-      title: "Digital Botanica",
-      artist: "Sarah Williams",
-      artistAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100",
-      peerLikes: 15,
-      totalLikes: 312,
-      totalViews: 2100,
-      trustScore: "high" as const,
-      keywords: ["digital", "nature", "futurism", "botanical"],
-      description: "A digital exploration of botanical forms through a contemporary lens, questioning our relationship with nature in an increasingly digital age.",
-      year: 2023,
-      medium: "Digital Art",
-      dimensions: "3000 × 4000 pixels",
-    },
-  ];
-
-  return allArtworks.find((art) => art.artworkId === artworkId);
-};
 
 const ArtworkDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -264,30 +187,32 @@ const ArtworkDetail = () => {
             Back to Discover
           </Link>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Image Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            {/* Image Section - sticky so it stays fixed while scrolling the content */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              className="sticky top-24"
+              className="w-full max-w-lg lg:max-w-full mx-auto lg:mx-0 lg:self-stretch"
             >
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted shadow-card">
-                <img
-                  src={artwork.image}
-                  alt={artwork.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = "/placeholder.svg";
-                  }}
-                />
-                <div className="absolute top-4 left-4">
-                  <span className={trustColors[artwork.trustScore]}>
-                    <Star className="w-3 h-3" />
-                    {trustLabels[artwork.trustScore]}
-                  </span>
+              <div className="sticky top-24 w-full h-fit">
+                <div className="relative aspect-[4/3] max-h-[min(65vh,520px)] w-full rounded-2xl overflow-hidden bg-muted shadow-card">
+                  <img
+                    src={artwork.image}
+                    alt={artwork.title}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = "/placeholder.svg";
+                    }}
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className={trustColors[artwork.trustScore]}>
+                      <Star className="w-3 h-3" />
+                      {trustLabels[artwork.trustScore]}
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>

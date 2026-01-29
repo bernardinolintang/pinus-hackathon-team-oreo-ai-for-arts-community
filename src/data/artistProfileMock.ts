@@ -12,7 +12,8 @@ export function getArtistProfileMock(
   artistId: string,
   _currentUserId?: string | null
 ): ArtistProfileResponse | null {
-  const a = artists.find((x) => x.id === artistId);
+  const slug = artistId.trim().toLowerCase().replace(/\s+/g, "-");
+  const a = artists.find((x) => x.id === artistId || x.id === slug || x.id.toLowerCase() === slug);
   if (!a) return null;
   const numericId = slugToNumeric[a.id] ?? 0;
   const peerFollowCount = 4;

@@ -86,7 +86,7 @@ const ArtworkCard = ({
   };
 
   return (
-    <Link to={`/artwork/${artworkId}`}>
+    <Link to={`/artworks/${artworkId}`}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

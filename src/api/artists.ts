@@ -7,6 +7,14 @@ export async function fetchArtistProfile(
   artistId: string,
   currentUserId?: string | null
 ): Promise<ArtistProfileResponse> {
+  // In development or when no real API, use mock so artist profiles (e.g. Elena Vance) always load
+  const useMockOnly = import.meta.env.DEV || !import.meta.env.VITE_API_URL;
+  if (useMockOnly) {
+    const mock = getArtistProfileMock(artistId, currentUserId);
+    if (mock) return mock;
+    throw new Error(`Artist not found: ${artistId}`);
+  }
+
   const params = new URLSearchParams();
   if (currentUserId) params.set("currentUserId", currentUserId);
   const qs = params.toString();
