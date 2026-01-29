@@ -39,15 +39,84 @@ const removeAuthToken = (): void => {
   localStorage.removeItem("auth_token");
 };
 
-// Mock API for development
+// Mock API for development - state is persisted to localStorage so your session survives refresh
+const MOCK_STATE_KEY = "atelier_mock_state";
+
+type MockUser = { email: string; password: string; name: string; id: string; avatar?: string; bio?: string; createdAt: string };
+type MockComment = { id: string; artworkId: string; userId: string; userName: string; userAvatar?: string; text: string; createdAt: string };
+
+interface PersistedMockState {
+  users: MockUser[];
+  tokenToUserId: Record<string, string>;
+  followedArtists: Record<string, string[]>;
+  favoriteArtworks: Record<string, string[]>;
+  likedArtworks: Record<string, string[]>;
+  comments: Record<string, MockComment[]>;
+}
+
 const mockApi = {
-  users: new Map<string, { email: string; password: string; name: string; id: string; avatar?: string; bio?: string; createdAt: string }>(),
+  users: new Map<string, MockUser>(),
   tokens: new Map<string, string>(),
   followedArtists: new Map<string, Set<string>>(),
   favoriteArtworks: new Map<string, Set<string>>(),
   likedArtworks: new Map<string, Set<string>>(),
-  comments: new Map<string, Array<{ id: string; artworkId: string; userId: string; userName: string; userAvatar?: string; text: string; createdAt: string }>>(),
+  comments: new Map<string, MockComment[]>(),
 };
+
+function saveMockState(): void {
+  try {
+    const state: PersistedMockState = {
+      users: Array.from(mockApi.users.values()),
+      tokenToUserId: Object.fromEntries(mockApi.tokens),
+      followedArtists: Object.fromEntries(
+        Array.from(mockApi.followedArtists.entries()).map(([k, v]) => [k, Array.from(v)])
+      ),
+      favoriteArtworks: Object.fromEntries(
+        Array.from(mockApi.favoriteArtworks.entries()).map(([k, v]) => [k, Array.from(v)])
+      ),
+      likedArtworks: Object.fromEntries(
+        Array.from(mockApi.likedArtworks.entries()).map(([k, v]) => [k, Array.from(v)])
+      ),
+      comments: Object.fromEntries(mockApi.comments),
+    };
+    localStorage.setItem(MOCK_STATE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn("Failed to persist mock auth state:", e);
+  }
+}
+
+function loadMockState(): void {
+  try {
+    const raw = localStorage.getItem(MOCK_STATE_KEY);
+    if (!raw) return;
+    const state: PersistedMockState = JSON.parse(raw);
+    mockApi.users.clear();
+    state.users.forEach((u) => mockApi.users.set(u.email, u));
+    mockApi.tokens.clear();
+    Object.entries(state.tokenToUserId || {}).forEach(([token, id]) => mockApi.tokens.set(token, id));
+    mockApi.followedArtists.clear();
+    Object.entries(state.followedArtists || {}).forEach(([id, arr]) =>
+      mockApi.followedArtists.set(id, new Set(arr))
+    );
+    mockApi.favoriteArtworks.clear();
+    Object.entries(state.favoriteArtworks || {}).forEach(([id, arr]) =>
+      mockApi.favoriteArtworks.set(id, new Set(arr))
+    );
+    mockApi.likedArtworks.clear();
+    Object.entries(state.likedArtworks || {}).forEach(([id, arr]) =>
+      mockApi.likedArtworks.set(id, new Set(arr))
+    );
+    mockApi.comments.clear();
+    Object.entries(state.comments || {}).forEach(([artworkId, arr]) =>
+      mockApi.comments.set(artworkId, arr)
+    );
+  } catch (e) {
+    console.warn("Failed to load mock auth state:", e);
+  }
+}
+
+// Restore mock state on load so existing auth_token is recognized
+loadMockState();
 
 const apiRequest = async <T>(
   endpoint: string,
@@ -127,6 +196,7 @@ const mockApiRequest = async <T>(
     mockApi.followedArtists.set(id, new Set());
     mockApi.favoriteArtworks.set(id, new Set());
     mockApi.likedArtworks.set(id, new Set());
+    saveMockState();
     return {
       user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt },
       token: authToken,
@@ -141,6 +211,7 @@ const mockApiRequest = async <T>(
     }
     const authToken = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     mockApi.tokens.set(authToken, user.id);
+    saveMockState();
     return {
       user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt },
       token: authToken,
@@ -159,6 +230,7 @@ const mockApiRequest = async <T>(
     const followed = mockApi.followedArtists.get(userId) || new Set();
     followed.add(artistId);
     mockApi.followedArtists.set(userId, followed);
+    saveMockState();
     return undefined as T;
   }
 
@@ -166,6 +238,7 @@ const mockApiRequest = async <T>(
     const artistId = endpoint.split("/").pop()!;
     const followed = mockApi.followedArtists.get(userId);
     followed?.delete(artistId);
+    saveMockState();
     return undefined as T;
   }
 
@@ -179,6 +252,7 @@ const mockApiRequest = async <T>(
     const favorites = mockApi.favoriteArtworks.get(userId) || new Set();
     favorites.add(data.artworkId);
     mockApi.favoriteArtworks.set(userId, favorites);
+    saveMockState();
     return undefined as T;
   }
 
@@ -186,6 +260,7 @@ const mockApiRequest = async <T>(
     const artworkId = endpoint.split("/").pop()!;
     const favorites = mockApi.favoriteArtworks.get(userId);
     favorites?.delete(artworkId);
+    saveMockState();
     return undefined as T;
   }
 
@@ -204,6 +279,7 @@ const mockApiRequest = async <T>(
     const user = Array.from(mockApi.users.values()).find((u) => u.id === userId);
     if (!user) throw new Error("User not found");
     Object.assign(user, data);
+    saveMockState();
     return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt } as T;
   }
 
@@ -213,6 +289,7 @@ const mockApiRequest = async <T>(
     const likes = mockApi.likedArtworks.get(userId) || new Set();
     likes.add(artworkId);
     mockApi.likedArtworks.set(userId, likes);
+    saveMockState();
     return undefined as T;
   }
 
@@ -220,6 +297,7 @@ const mockApiRequest = async <T>(
     const artworkId = endpoint.split("/")[2];
     const likes = mockApi.likedArtworks.get(userId);
     likes?.delete(artworkId);
+    saveMockState();
     return undefined as T;
   }
 
@@ -240,6 +318,7 @@ const mockApiRequest = async <T>(
     };
     comments.push(comment);
     mockApi.comments.set(artworkId, comments);
+    saveMockState();
     return comment as T;
   }
 
@@ -256,6 +335,7 @@ const mockApiRequest = async <T>(
     const comments = mockApi.comments.get(artworkId) || [];
     const filtered = comments.filter((c) => c.id !== commentId);
     mockApi.comments.set(artworkId, filtered);
+    saveMockState();
     return undefined as T;
   }
 
@@ -282,7 +362,12 @@ export const authApi = {
   },
 
   logout: (): void => {
+    const token = getAuthToken();
     removeAuthToken();
+    if (USE_MOCK_API && token) {
+      mockApi.tokens.delete(token);
+      saveMockState();
+    }
   },
 
   getCurrentUser: async (): Promise<User> => {
