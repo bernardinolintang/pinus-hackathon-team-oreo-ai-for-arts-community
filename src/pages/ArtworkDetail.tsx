@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, MessageCircle, Users, Star, Share2, Bookmark, Send, Trash2 } from "lucide-react";
+import { ArrowLeft, Heart, MessageCircle, Users, Star, Share2, Send, Trash2 } from "lucide-react";
+import { ReportDialog } from "@/components/ReportDialog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -275,6 +276,11 @@ const ArtworkDetail = () => {
                         <Share2 className="w-4 h-4 mr-2" />
                         Share
                       </Button>
+                      <ReportDialog
+                        context="artwork"
+                        targetId={artwork.artworkId}
+                        targetLabel={artwork.title}
+                      />
                     </>
                   ) : (
                     <div className="w-full p-4 bg-muted rounded-lg text-center">

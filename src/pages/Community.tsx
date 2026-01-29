@@ -8,6 +8,11 @@ import {
   Award,
   Heart,
   ArrowRight,
+  UserPlus,
+  ThumbsUp,
+  Bell,
+  LayoutGrid,
+  BadgeCheck,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -70,6 +75,93 @@ export default function Community() {
                 engagement-maximizing algorithms.
               </p>
             </motion.div>
+          </div>
+        </section>
+
+        {/* How you can interact */}
+        <section className="py-16 md:py-20 border-b border-border">
+          <div className="container mx-auto px-6">
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="font-serif text-2xl md:text-3xl font-semibold mb-3"
+            >
+              How you can interact
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-muted-foreground mb-10 max-w-2xl"
+            >
+              Social validation, peer learning, and community-driven trust are at the heart of Atelier. Here’s how you participate.
+            </motion.p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: UserPlus,
+                  title: "Follow artists",
+                  description: "Build your network by following artists you admire. Your feed and recommendations are shaped by who you follow.",
+                  link: "/artists",
+                },
+                {
+                  icon: ThumbsUp,
+                  title: "Like & comment",
+                  description: "Engage with artworks and artists. Your likes and comments support creators and help peers discover work.",
+                  link: "/discover",
+                },
+                {
+                  icon: Bell,
+                  title: "Stay in the loop",
+                  description: "Get notified when someone likes your work, comments, or follows you. Respond and build real connections.",
+                  link: "/discover",
+                },
+                {
+                  icon: Award,
+                  title: "Peer endorsements",
+                  description: "Discover through endorsements from verified artists. See why work is recommended—linked to people you trust.",
+                  link: "/community",
+                },
+                {
+                  icon: LayoutGrid,
+                  title: "Community curation",
+                  description: "Explore collections curated by verified community curators. Themes, moods, and stories—all peer-driven.",
+                  link: "/collections",
+                },
+                {
+                  icon: BadgeCheck,
+                  title: "Trust signals",
+                  description: "See reputation and peer validation on artists and artworks. We surface why something is trusted, not just popularity.",
+                  link: "/trust",
+                },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={item.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Link
+                      to={item.link}
+                      className="block h-full p-6 rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-hover transition-all group"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                        <Icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <h3 className="font-serif text-lg font-semibold mb-2">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <span className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-primary">
+                        Learn more <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </section>
 

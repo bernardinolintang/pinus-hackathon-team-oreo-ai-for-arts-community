@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { ReportDialog } from "@/components/ReportDialog";
 import { ArtistHeader } from "@/components/artist-profile/ArtistHeader";
 import { ArtistBio } from "@/components/artist-profile/ArtistBio";
 import { TrustSignals } from "@/components/artist-profile/TrustSignals";
@@ -99,6 +100,18 @@ export default function ArtistProfile() {
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           <ArtistHeader artist={artist} showBackLink />
+            <div className="mt-4 flex justify-end">
+              <ReportDialog
+                context="profile"
+                targetId={String(artist.id)}
+                targetLabel={artist.name}
+                trigger={
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    Report this profile
+                  </Button>
+                }
+              />
+            </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
             <div className="lg:col-span-2 space-y-8">

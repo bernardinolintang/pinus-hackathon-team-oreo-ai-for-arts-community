@@ -74,13 +74,19 @@ export function ArtistHeader({
                   "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
                   "bg-primary/12 text-primary border border-primary/20"
                 )}
-                aria-label="Verified Artist"
+                aria-label="Verified Artist — reviewed by moderators before publishing"
+                title="Reviewed by moderators before publishing"
               >
                 <BadgeCheck className="w-3.5 h-3.5" />
                 Verified Artist
               </span>
             )}
           </div>
+          {artist.isVerified && (
+            <p className="text-xs text-muted-foreground mb-2">
+              Reviewed by moderators before publishing
+            </p>
+          )}
 
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-muted-foreground mb-4">
             {hasFollowers && artist.followerPreview ? (
