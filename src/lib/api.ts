@@ -172,10 +172,30 @@ function loadMockState(): void {
   }
 }
 
-export const MODERATOR_EMAIL = "denxifenn@gmail.com";
+export const MODERATOR_EMAIL = "demo@email.com";
+
+const DEMO_MODERATOR_ID = "demo_moderator";
+
+function ensureDemoModerator(): void {
+  if (mockApi.users.has(MODERATOR_EMAIL)) return;
+  const demoUser: MockUser = {
+    id: DEMO_MODERATOR_ID,
+    email: MODERATOR_EMAIL,
+    password: "demo",
+    name: "Demo Moderator",
+    createdAt: new Date().toISOString(),
+    role: "user",
+  };
+  mockApi.users.set(MODERATOR_EMAIL, demoUser);
+  mockApi.followedArtists.set(DEMO_MODERATOR_ID, new Set());
+  mockApi.favoriteArtworks.set(DEMO_MODERATOR_ID, new Set());
+  mockApi.likedArtworks.set(DEMO_MODERATOR_ID, new Set());
+  saveMockState();
+}
 
 // Restore mock state on load so existing auth_token is recognized
 loadMockState();
+ensureDemoModerator();
 
 const apiRequest = async <T>(
   endpoint: string,
@@ -360,7 +380,7 @@ const mockApiRequest = async <T>(
     return undefined as T;
   }
 
-  // Moderator: list pending artist applications (only denxifenn@gmail.com)
+  // Moderator: list pending artist applications (moderator account only)
   if (endpoint === "/moderation/artist-applications" && options.method === "GET" && userId) {
     const currentUser = Array.from(mockApi.users.values()).find((u) => u.id === userId);
     if (!currentUser || currentUser.email !== MODERATOR_EMAIL) {
