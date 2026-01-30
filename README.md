@@ -1,4 +1,14 @@
-# Welcome to your Lovable project
+# Atelier – Community-Driven Art Discovery
+
+Discover art through trusted connections. Atelier is a community where peer validation, human verification, and ethical moderation shape how you explore and collect art—not opaque algorithms.
+
+## For judges (demo)
+
+To try the full flow, including **moderation**:
+
+- **Demo moderator account:** `demo@email.com` / `demo`
+- Sign in on the **Login** page with these credentials, then open **Moderation** in the nav. You can approve or reject pending artist applications there.
+- Optional: sign up as an artist (e.g. from **Sign up** → “Register as artist”), then log in as the demo moderator and approve that request on the Moderation page.
 
 ## Project info
 

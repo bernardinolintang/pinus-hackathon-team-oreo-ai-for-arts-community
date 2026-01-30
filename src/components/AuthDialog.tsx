@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { getUserMessage } from "@/lib/errors";
 
 interface AuthDialogProps {
   open: boolean;
@@ -45,7 +46,7 @@ const AuthDialog = ({ open, onOpenChange, defaultTab = "login" }: AuthDialogProp
       onOpenChange(false);
       // Navigation is handled by AuthContext
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to login");
+      toast.error(getUserMessage(error, "login"));
     } finally {
       setLoginLoading(false);
     }
@@ -72,7 +73,7 @@ const AuthDialog = ({ open, onOpenChange, defaultTab = "login" }: AuthDialogProp
       onOpenChange(false);
       // Navigation is handled by AuthContext
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create account");
+      toast.error(getUserMessage(error, "signup"));
     } finally {
       setSignupLoading(false);
     }
@@ -120,7 +121,7 @@ const AuthDialog = ({ open, onOpenChange, defaultTab = "login" }: AuthDialogProp
                   disabled={loginLoading}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loginLoading}>
+              <Button type="submit" className="w-full" disabled={loginLoading} aria-busy={loginLoading}>
                 {loginLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
@@ -176,7 +177,7 @@ const AuthDialog = ({ open, onOpenChange, defaultTab = "login" }: AuthDialogProp
                   disabled={signupLoading}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={signupLoading}>
+              <Button type="submit" className="w-full" disabled={signupLoading} aria-busy={signupLoading}>
                 {signupLoading ? "Creating account..." : "Sign Up"}
               </Button>
             </form>

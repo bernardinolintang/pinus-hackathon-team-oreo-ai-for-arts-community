@@ -97,8 +97,9 @@ export function ArtworkGallery({
       </div>
 
       {paginate && hasMore && (
-        <div ref={loadMoreRef} className="flex justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <div ref={loadMoreRef} className="flex justify-center py-8" role="status" aria-live="polite" aria-busy="true">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" aria-hidden />
+          <span className="sr-only">Loading more artworks</span>
         </div>
       )}
     </motion.section>

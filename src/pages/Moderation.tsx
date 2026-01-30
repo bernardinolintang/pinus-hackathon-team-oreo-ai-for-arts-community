@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Scale, Flag, Eye, RefreshCw, Mail, FileText, CheckCircle2, Palette, Check, X } from "lucide-react";
@@ -9,8 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { moderationApi, MODERATOR_EMAIL, type ArtistApplication } from "@/lib/api";
+import { getUserMessage } from "@/lib/errors";
 
 const sections = [
   {
@@ -70,19 +72,28 @@ const Moderation = () => {
   const [appealSubmitting, setAppealSubmitting] = useState(false);
   const [artistApplications, setArtistApplications] = useState<ArtistApplication[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [applicationsError, setApplicationsError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const isModerator = user?.email === MODERATOR_EMAIL;
 
+  const fetchApplications = useCallback(() => {
+    if (!isModerator) return;
+    setApplicationsError(null);
+    setApplicationsLoading(true);
+    moderationApi
+      .getArtistApplications()
+      .then(setArtistApplications)
+      .catch((e) => {
+        const msg = getUserMessage(e, "moderation");
+        setApplicationsError(msg);
+        toast.error(msg);
+      })
+      .finally(() => setApplicationsLoading(false));
+  }, [isModerator]);
+
   useEffect(() => {
-    if (isModerator) {
-      setApplicationsLoading(true);
-      moderationApi
-        .getArtistApplications()
-        .then(setArtistApplications)
-        .catch(() => toast.error("Failed to load artist applications"))
-        .finally(() => setApplicationsLoading(false));
-    }
-  }, [isModerator, user?.id]);
+    if (isModerator) fetchApplications();
+  }, [isModerator, user?.id, fetchApplications]);
 
   const handleApprove = async (userId: string) => {
     setProcessingId(userId);
@@ -91,7 +102,7 @@ const Moderation = () => {
       setArtistApplications((prev) => prev.filter((a) => a.userId !== userId));
       toast.success("Artist application approved.");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to approve");
+      toast.error(getUserMessage(e, "approve"));
     } finally {
       setProcessingId(null);
     }
@@ -104,7 +115,7 @@ const Moderation = () => {
       setArtistApplications((prev) => prev.filter((a) => a.userId !== userId));
       toast.success("Artist application rejected.");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to reject");
+      toast.error(getUserMessage(e, "reject"));
     } finally {
       setProcessingId(null);
     }
@@ -146,6 +157,14 @@ const Moderation = () => {
               Learn how content is reviewed and how we handle reports from the community. Ethical moderation helps keep Atelier a place for meaningful interaction and trust.
             </p>
 
+            {!isModerator && (
+              <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
+                <p className="text-muted-foreground">
+                  Artist applications are reviewed by the moderation team. <strong className="text-foreground">Judges:</strong> sign in with the demo moderator account (<span className="font-mono text-foreground">demo@email.com</span> / <span className="font-mono text-foreground">demo</span>) to try approving applications. <Link to="/login" className="text-primary hover:underline font-medium">Sign in as moderator</Link>
+                </p>
+              </div>
+            )}
+
             {/* Artist applications (moderator only) */}
             {isModerator && (
               <div className="mb-10 p-6 rounded-2xl bg-card border border-border">
@@ -157,7 +176,28 @@ const Moderation = () => {
                   Approve or reject requests from users who want to register as artists. Approved users can post artworks and see who liked and commented on their work.
                 </p>
                 {applicationsLoading ? (
-                  <p className="text-sm text-muted-foreground">Loading…</p>
+                  <ul className="space-y-3" role="status" aria-live="polite" aria-busy="true">
+                    {[1, 2, 3].map((i) => (
+                      <li key={i} className="flex items-center justify-between gap-4 p-3 rounded-lg border border-border bg-muted/30">
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <Skeleton className="h-5 w-32" />
+                          <Skeleton className="h-4 w-48" />
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <Skeleton className="h-9 w-20" />
+                          <Skeleton className="h-9 w-16" />
+                        </div>
+                      </li>
+                    ))}
+                    <span className="sr-only">Loading artist applications</span>
+                  </ul>
+                ) : applicationsError ? (
+                  <div className="text-center py-6">
+                    <p className="text-sm text-muted-foreground mb-3">{applicationsError}</p>
+                    <Button variant="outline" size="sm" onClick={fetchApplications}>
+                      Try again
+                    </Button>
+                  </div>
                 ) : artistApplications.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No pending artist applications.</p>
                 ) : (

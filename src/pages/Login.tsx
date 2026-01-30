@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import Header from "@/components/Header";
+import { getUserMessage } from "@/lib/errors";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -22,8 +23,9 @@ const Login = () => {
     try {
       await login(email, password);
       toast.success("Welcome back!");
+      navigate("/discover", { replace: true });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to login");
+      toast.error(getUserMessage(error, "login"));
     } finally {
       setLoading(false);
     }
@@ -66,7 +68,7 @@ const Login = () => {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading} aria-busy={loading}>
                 {loading ? "Signing in..." : "Sign in"}
               </Button>
               <p className="text-sm text-center text-muted-foreground">
@@ -75,6 +77,11 @@ const Login = () => {
                   Sign up
                 </Link>
               </p>
+              <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-center">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Try demo (for judges)</p>
+                <p className="text-sm text-foreground font-mono">demo@email.com / demo</p>
+                <p className="text-xs text-muted-foreground mt-1">Unlocks moderator flow: approve artist applications on the Moderation page.</p>
+              </div>
             </CardFooter>
           </form>
         </Card>

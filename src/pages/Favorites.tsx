@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,13 +6,15 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ArtworkCard from "@/components/ArtworkCard";
-import { Bookmark, Loader2 } from "lucide-react";
+import ArtworkCardSkeleton from "@/components/ArtworkCardSkeleton";
+import { Bookmark } from "lucide-react";
 import { userApi } from "@/lib/api";
 import { getArtworkById } from "@/data/artworks";
 import type { ArtworkDetailItem } from "@/data/artworks";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { getUserMessage } from "@/lib/errors";
 
 const Favorites = () => {
   const { user } = useAuth();
@@ -22,14 +24,33 @@ const Favorites = () => {
 
   useDocumentTitle("My Favorites");
 
+  const fetchFavorites = useCallback(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    setError(null);
+    setLoading(true);
+    userApi
+      .getFavoriteArtworks()
+      .then((list) => {
+        const resolved = list
+          .map((f) => getArtworkById(f.artworkId))
+          .filter((a): a is ArtworkDetailItem => a != null);
+        setArtworks(resolved);
+      })
+      .catch((e) => setError(getUserMessage(e, "favorites")))
+      .finally(() => setLoading(false));
+  }, [user]);
+
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
     let cancelled = false;
-    setLoading(true);
     setError(null);
+    setLoading(true);
     userApi
       .getFavoriteArtworks()
       .then((list) => {
@@ -40,7 +61,7 @@ const Favorites = () => {
         setArtworks(resolved);
       })
       .catch((e) => {
-        if (!cancelled) setError(e?.message ?? "Failed to load favorites");
+        if (!cancelled) setError(getUserMessage(e, "favorites"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -66,14 +87,16 @@ const Favorites = () => {
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                    <Loader2 className="w-12 h-12 animate-spin mb-4" aria-hidden />
-                    <p>Loading your favorites…</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="status" aria-live="polite" aria-busy="true">
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
+                      <ArtworkCardSkeleton key={i} delay={i * 0.05} />
+                    ))}
+                    <span className="sr-only">Loading your favorites</span>
                   </div>
                 ) : error ? (
                   <div className="text-center py-20">
                     <p className="text-muted-foreground mb-4">{error}</p>
-                    <Button variant="outline" onClick={() => window.location.reload()}>
+                    <Button variant="outline" onClick={fetchFavorites}>
                       Try again
                     </Button>
                   </div>

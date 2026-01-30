@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { Search, BadgeCheck } from "lucide-react";
+import { Search, BadgeCheck, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArtistCard from "@/components/ArtistCard";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { artists } from "@/data/artists";
 
 type ReputationFilter = "all" | "established" | "rising" | "newcomer";
@@ -114,21 +115,20 @@ export default function Artists() {
 
             {filtered.length === 0 ? (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-16 text-muted-foreground"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-16"
               >
-                <p className="text-lg">No artists match your filters.</p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearch("");
-                    setReputationFilter("all");
-                  }}
-                  className="mt-3 text-sm font-medium text-primary hover:underline"
-                >
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
+                  <Users className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <h3 className="font-serif text-xl font-semibold mb-2">No artists match your filters</h3>
+                <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                  Try different search terms or clear filters to see all verified artists.
+                </p>
+                <Button variant="outline" onClick={() => { setSearch(""); setReputationFilter("all"); }}>
                   Clear filters
-                </button>
+                </Button>
               </motion.div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

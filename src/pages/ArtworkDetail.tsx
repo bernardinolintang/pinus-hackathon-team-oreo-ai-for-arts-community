@@ -19,6 +19,8 @@ import { userApi, type Comment } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import type { MockArtistArtwork } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getUserMessage } from "@/lib/errors";
 
 const ArtworkDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -80,8 +82,31 @@ const ArtworkDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main id="main-content" className="pt-24 pb-16 flex items-center justify-center">
-          <div className="animate-pulse text-muted-foreground">Loading artwork…</div>
+        <main id="main-content" className="pt-24 pb-16">
+          <div className="container mx-auto px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start" role="status" aria-live="polite" aria-busy="true">
+              <div className="w-full max-w-lg lg:max-w-full mx-auto lg:mx-0">
+                <Skeleton className="aspect-[4/3] max-h-[min(65vh,520px)] w-full rounded-2xl" />
+              </div>
+              <div className="space-y-6">
+                <Skeleton className="h-10 w-3/4" />
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Skeleton className="h-10 flex-1" />
+                  <Skeleton className="h-10 flex-1" />
+                  <Skeleton className="h-10 flex-1" />
+                </div>
+                <Skeleton className="h-24 w-full" />
+              </div>
+              <span className="sr-only">Loading artwork</span>
+            </div>
+          </div>
         </main>
         <Footer />
       </div>
@@ -124,7 +149,7 @@ const ArtworkDetail = () => {
       setComments(fetchedComments);
     } catch (error) {
       console.error("Failed to load comments:", error);
-      // For demo purposes, use empty array if API fails
+      toast.error(getUserMessage(error, "comments"));
       setComments([]);
     } finally {
       setLoadingComments(false);
@@ -583,7 +608,10 @@ const ArtworkDetail = () => {
 
                 {/* Comments List */}
                 {loadingComments ? (
-                  <div className="text-center py-8 text-muted-foreground">Loading comments...</div>
+                  <div className="text-center py-8 text-muted-foreground" role="status" aria-live="polite" aria-busy="true">
+                    <span className="sr-only">Loading comments</span>
+                    <p aria-hidden>Loading comments...</p>
+                  </div>
                 ) : comments.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     No comments yet. Be the first to comment!

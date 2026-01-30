@@ -47,8 +47,16 @@ const queryClient = new QueryClient();
 
 function PageFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background" aria-label="Loading">
-      <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+    <div
+      className="min-h-screen flex items-center justify-center bg-background"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" aria-hidden />
+        <span className="sr-only">Loading page</span>
+      </div>
     </div>
   );
 }
