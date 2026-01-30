@@ -41,6 +41,22 @@ export interface ArtistApplication {
   status: ArtistApplicationStatus;
 }
 
+export interface ArtistPortfolioSubmission {
+  specialty: string;
+  bio: string;
+  location: string;
+  website?: string;
+  instagram?: string;
+  twitter?: string;
+  portfolioItems: Array<{
+    title: string;
+    imageUrl: string;
+    description?: string;
+    year?: string;
+    medium?: string;
+  }>;
+}
+
 const getAuthToken = (): string | null => {
   return localStorage.getItem("auth_token");
 };
@@ -328,6 +344,20 @@ const mockApiRequest = async <T>(
     Object.assign(user, data);
     saveMockState();
     return { id: user.id, email: user.email, name: user.name, avatar: user.avatar, bio: user.bio, createdAt: user.createdAt, role: user.role, artistApplicationStatus: user.artistApplicationStatus } as T;
+  }
+
+  // Artist portfolio submission
+  if (endpoint === "/users/artist-application" && options.method === "POST" && userId) {
+    const data = JSON.parse(options.body as string);
+    const user = Array.from(mockApi.users.values()).find((u) => u.id === userId);
+    if (!user) throw new Error("User not found");
+    
+    // Set artist application status to pending
+    user.artistApplicationStatus = "pending";
+    // Store portfolio data (in real app, this would be stored separately)
+    // For now, we'll just mark the user as having submitted
+    saveMockState();
+    return undefined as T;
   }
 
   // Moderator: list pending artist applications (only denxifenn@gmail.com)
@@ -641,6 +671,13 @@ export const userApi = {
     } catch {
       return null;
     }
+  },
+
+  submitArtistPortfolio: async (data: ArtistPortfolioSubmission): Promise<void> => {
+    return apiRequest<void>("/users/artist-application", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   },
 };
 

@@ -36,6 +36,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const SignupArtist = lazy(() => import("./pages/SignupArtist"));
+const ArtistRegistration = lazy(() => import("./pages/ArtistRegistration"));
 const Profile = lazy(() => import("./pages/Profile"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
 const ArtistDashboard = lazy(() => import("./pages/ArtistDashboard"));
@@ -89,6 +90,7 @@ const App = () => (
             <Route path="/login" element={<Suspense fallback={<PageFallback />}><Login /></Suspense>} />
             <Route path="/signup" element={<Suspense fallback={<PageFallback />}><Signup /></Suspense>} />
             <Route path="/signup/artist" element={<Suspense fallback={<PageFallback />}><SignupArtist /></Suspense>} />
+            <Route path="/artist/register" element={<Suspense fallback={<PageFallback />}><ArtistRegistration /></Suspense>} />
             <Route path="/profile" element={<Suspense fallback={<PageFallback />}><Profile /></Suspense>} />
             <Route path="/profile/edit" element={<Suspense fallback={<PageFallback />}><EditProfile /></Suspense>} />
             <Route path="/artist/dashboard" element={<Suspense fallback={<PageFallback />}><ArtistDashboard /></Suspense>} />

@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { Search, Bell, User, LogOut, Settings, Bookmark, Menu, X, ShieldCheck } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Search, Bell, User, LogOut, Settings, Bookmark, Menu, X, ShieldCheck, Palette, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,9 +28,13 @@ import AuthDialog from "@/components/AuthDialog";
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
+  // Check if we're on login/signup pages
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/signup/artist";
 
   const handleNavClick = (e: React.MouseEvent, path: string) => {
     if (!user) {
@@ -64,6 +68,29 @@ const Header = () => {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  // Minimal header for auth pages
+  if (isAuthPage) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 rounded-full gradient-trust" />
+            <span className="font-serif text-xl font-semibold">Atelier</span>
+          </Link>
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 font-medium shadow-sm hover:shadow-md transition-shadow"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </Button>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <TooltipProvider>
@@ -108,9 +135,36 @@ const Header = () => {
               Trending
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
+            {user && user.artistApplicationStatus !== "approved" && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="ml-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              >
+                <Link to="/artist/register" className="flex items-center gap-2">
+                  <Palette className="w-4 h-4" />
+                  Become an Artist
+                </Link>
+              </Button>
+            )}
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Mobile: Become an Artist button (visible when logged in) */}
+            {user && user.artistApplicationStatus !== "approved" && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="md:hidden border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              >
+                <Link to="/artist/register" className="flex items-center gap-2">
+                  <Palette className="w-4 h-4" />
+                  <span className="hidden sm:inline">Become an Artist</span>
+                </Link>
+              </Button>
+            )}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
@@ -176,6 +230,14 @@ const Header = () => {
                     Favorites
                   </Link>
                 </DropdownMenuItem>
+                {user.artistApplicationStatus !== "approved" && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/artist/register" className="cursor-pointer">
+                      <Palette className="mr-2 h-4 w-4" />
+                      Become an Artist
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/settings" className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
@@ -295,6 +357,16 @@ const Header = () => {
                     >
                       Favorites
                     </Link>
+                    {user.artistApplicationStatus !== "approved" && (
+                      <Link
+                        to="/artist/register"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2 flex items-center gap-2"
+                      >
+                        <Palette className="w-4 h-4" />
+                        Become an Artist
+                      </Link>
+                    )}
                     <Link
                       to="/settings"
                       onClick={() => setMobileMenuOpen(false)}

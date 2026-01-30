@@ -30,10 +30,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Header />
-      <div className="flex items-center justify-center pt-32 pb-16 px-6">
-        <Card className="w-full max-w-md">
+      <div className="fixed inset-0 bg-background z-40 flex items-center justify-center pt-16 pb-16 px-6">
+        <Card className="w-full max-w-md relative z-50">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-serif">Welcome back</CardTitle>
             <CardDescription>Sign in to your account to continue</CardDescription>
