@@ -12,72 +12,43 @@ To try the full flow, including **moderation**:
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+- **Repository:** [pinus-hackathon-team-oreo-ai-for-arts-community](https://github.com/bernardinolintang/pinus-hackathon-team-oreo-ai-for-arts-community)
 
-## How can I edit this code?
+## Run locally
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requirements: Node.js and npm (or [nvm](https://github.com/nvm-sh/nvm#installing-and-updating)).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/bernardinolintang/pinus-hackathon-team-oreo-ai-for-arts-community.git
+cd pinus-hackathon-team-oreo-ai-for-arts-community
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open the URL shown in the terminal (e.g. `http://localhost:5173`).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Tech stack
 
-**Use GitHub Codespaces**
+- **Vite** – build tool
+- **TypeScript** – type safety
+- **React** – UI
+- **shadcn/ui** – components
+- **Tailwind CSS** – styling
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Build for production
 
-## What technologies are used for this project?
+```sh
+npm run build
+```
 
-This project is built with:
+Output is in the `dist/` folder. Deploy that folder to any static host (Vercel, Netlify, GitHub Pages, etc.).
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Edit the code
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- **Locally:** Use your IDE in this repo; commit and push to GitHub.
+- **GitHub:** Use the “Edit” button on any file in the repo, or open a [Codespace](https://github.com/features/codespaces) from the “Code” menu.
