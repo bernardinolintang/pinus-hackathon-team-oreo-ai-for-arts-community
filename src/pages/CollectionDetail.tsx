@@ -1,4 +1,5 @@
 import { useParams, Link, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ArrowLeft, Users, Heart, BadgeCheck, Calendar, ImageIcon } from "lucide-react";
 import Header from "@/components/Header";
@@ -11,10 +12,12 @@ import { format } from "date-fns";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const CollectionDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const collection = id ? getCollectionById(id) : undefined;
 
-  useDocumentTitle(collection?.title ?? "Collection");
+  const displayTitle = collection ? t(`collections.items.${collection.id}.title`, { defaultValue: collection.title }) : t("collections.title");
+  useDocumentTitle(displayTitle);
 
   if (!collection) {
     return <Navigate to="/collections" replace />;
@@ -44,12 +47,12 @@ const CollectionDetail = () => {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link to="/collections">Collections</Link>
+                  <Link to="/collections">{t("collections.title")}</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{title}</BreadcrumbPage>
+                <BreadcrumbPage>{displayTitle}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -64,7 +67,7 @@ const CollectionDetail = () => {
             <div className="relative aspect-[21/9] md:aspect-[3/1]">
               <img
                 src={coverImage}
-                alt={title}
+                alt={displayTitle}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -78,7 +81,7 @@ const CollectionDetail = () => {
                   </span>
                 </div>
                 <h1 className="font-serif text-3xl md:text-4xl font-semibold text-white drop-shadow-md">
-                  {title}
+                  {displayTitle}
                 </h1>
               </div>
             </div>
@@ -99,7 +102,7 @@ const CollectionDetail = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm text-muted-foreground">Curated by</p>
+                <p className="text-sm text-muted-foreground">{t("collectionDetail.curatedBy")}</p>
                 <p className="font-medium flex items-center gap-1.5">
                   {curator.name}
                   {curator.verified && (
@@ -111,19 +114,19 @@ const CollectionDetail = () => {
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4" />
-                Created {format(new Date(createdAt), "MMMM d, yyyy")}
+                {t("collectionDetail.created")} {format(new Date(createdAt), "MMMM d, yyyy")}
               </span>
               <span className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
-                {followersCount.toLocaleString()} followers
+                {followersCount.toLocaleString()} {t("collectionDetail.followers")}
               </span>
               <span className="flex items-center gap-1.5">
                 <Heart className="w-4 h-4" />
-                {peerEndorsements} endorsements
+                {peerEndorsements} {t("collectionDetail.endorsements")}
               </span>
               <span className="flex items-center gap-1.5">
                 <ImageIcon className="w-4 h-4" />
-                {artworkCount} works
+                {artworkCount} {t("collectionDetail.works")}
               </span>
             </div>
           </motion.div>
@@ -135,8 +138,8 @@ const CollectionDetail = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="mb-10"
           >
-            <h2 className="font-serif text-xl font-semibold mb-3">About this collection</h2>
-            <p className="text-muted-foreground leading-relaxed">{description}</p>
+            <h2 className="font-serif text-xl font-semibold mb-3">{t("collectionDetail.aboutCollection")}</h2>
+            <p className="text-muted-foreground leading-relaxed">{t(`collections.items.${collection.id}.description`, { defaultValue: description })}</p>
           </motion.section>
 
           {/* Featured works */}
@@ -170,7 +173,7 @@ const CollectionDetail = () => {
               <div className="mt-4">
                 <Link to="/discover">
                   <Button variant="outline" size="sm">
-                    Explore more on Discover
+                    {t("collectionDetail.exploreMore")}
                   </Button>
                 </Link>
               </div>

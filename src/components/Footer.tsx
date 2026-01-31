@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import Logo from "@/components/Logo";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -8,10 +9,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-8 md:mb-12">
           <div className="md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full gradient-trust" />
-              <span className="font-serif text-lg sm:text-xl font-semibold">{t("common.appName")}</span>
-            </Link>
+            <Logo className="mb-4" height="h-8" />
             <p className="text-sm text-muted-foreground">
               {t("footer.tagline")}
             </p>

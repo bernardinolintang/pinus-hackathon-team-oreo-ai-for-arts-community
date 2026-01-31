@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import {
   Users,
@@ -31,25 +32,23 @@ const featuredEndorsements = artists.flatMap((a) =>
 ).slice(0, 6);
 
 const principles = [
-  {
-    icon: Shield,
-    title: "Trust over popularity",
-    description: "Recommendations come from your network and verified curators, not opaque engagement metrics.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Peer learning",
-    description: "Artists endorse each other. Discover work through genuine appreciation and shared practice.",
-  },
-  {
-    icon: Sparkles,
-    title: "Explainable signals",
-    description: "We show why an artist or artwork is suggested—linked to people you follow and trust.",
-  },
+  { icon: Shield, titleKey: "community.trustOverPop", descKey: "community.trustOverPopDesc" },
+  { icon: MessageCircle, titleKey: "community.peerLearning", descKey: "community.peerLearningDesc" },
+  { icon: Sparkles, titleKey: "community.explainableSignals", descKey: "community.explainableSignalsDesc" },
+];
+
+const interactItems = [
+  { icon: UserPlus, titleKey: "community.followArtists", descKey: "community.followArtistsDesc", link: "/artists" },
+  { icon: ThumbsUp, titleKey: "community.likeComment", descKey: "community.likeCommentDesc", link: "/discover" },
+  { icon: Bell, titleKey: "community.stayLoop", descKey: "community.stayLoopDesc", link: "/discover" },
+  { icon: Award, titleKey: "community.peerEndorsements", descKey: "community.peerEndorsementsDesc", link: "/community" },
+  { icon: LayoutGrid, titleKey: "community.communityCuration", descKey: "community.communityCurationDesc", link: "/collections" },
+  { icon: BadgeCheck, titleKey: "community.trustSignals", descKey: "community.trustSignalsDesc", link: "/trust" },
 ];
 
 export default function Community() {
-  useDocumentTitle("Community");
+  const { t } = useTranslation();
+  useDocumentTitle(t("community.badge"));
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -66,15 +65,13 @@ export default function Community() {
             >
               <div className="flex items-center gap-2 text-primary mb-3">
                 <Users className="w-5 h-5" />
-                <span className="text-sm font-medium">Community</span>
+                <span className="text-sm font-medium">{t("community.badge")}</span>
               </div>
               <h1 className="font-serif text-4xl md:text-5xl font-semibold mb-4">
-                Built on trust, not likes
+                {t("community.title")}
               </h1>
               <p className="text-lg text-muted-foreground">
-                Atelier is a community-driven art platform. Discovery is shaped by
-                your network, peer endorsements, and transparent reputation—not
-                engagement-maximizing algorithms.
+                {t("community.subtitle")}
               </p>
             </motion.div>
           </div>
@@ -89,7 +86,7 @@ export default function Community() {
               viewport={{ once: true }}
               className="font-serif text-2xl md:text-3xl font-semibold mb-3"
             >
-              How you can interact
+              {t("community.howInteract")}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
@@ -97,51 +94,14 @@ export default function Community() {
               viewport={{ once: true }}
               className="text-muted-foreground mb-10 max-w-2xl"
             >
-              Social validation, peer learning, and community-driven trust are at the heart of Atelier. Here’s how you participate.
+              {t("community.howInteractDesc")}
             </motion.p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: UserPlus,
-                  title: "Follow artists",
-                  description: "Build your network by following artists you admire. Your feed and recommendations are shaped by who you follow.",
-                  link: "/artists",
-                },
-                {
-                  icon: ThumbsUp,
-                  title: "Like & comment",
-                  description: "Engage with artworks and artists. Your likes and comments support creators and help peers discover work.",
-                  link: "/discover",
-                },
-                {
-                  icon: Bell,
-                  title: "Stay in the loop",
-                  description: "Get notified when someone likes your work, comments, or follows you. Respond and build real connections.",
-                  link: "/discover",
-                },
-                {
-                  icon: Award,
-                  title: "Peer endorsements",
-                  description: "Discover through endorsements from verified artists. See why work is recommended—linked to people you trust.",
-                  link: "/community",
-                },
-                {
-                  icon: LayoutGrid,
-                  title: "Community curation",
-                  description: "Explore collections curated by verified community curators. Themes, moods, and stories—all peer-driven.",
-                  link: "/collections",
-                },
-                {
-                  icon: BadgeCheck,
-                  title: "Trust signals",
-                  description: "See reputation and peer validation on artists and artworks. We surface why something is trusted, not just popularity.",
-                  link: "/trust",
-                },
-              ].map((item, i) => {
+              {interactItems.map((item, i) => {
                 const Icon = item.icon;
                 return (
                   <motion.div
-                    key={item.title}
+                    key={item.titleKey}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -154,10 +114,10 @@ export default function Community() {
                       <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                         <Icon className="w-6 h-6 text-primary" />
                       </div>
-                      <h3 className="font-serif text-lg font-semibold mb-2">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <h3 className="font-serif text-lg font-semibold mb-2">{t(item.titleKey)}</h3>
+                      <p className="text-sm text-muted-foreground">{t(item.descKey)}</p>
                       <span className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-primary">
-                        Learn more <ArrowRight className="w-4 h-4" />
+                        {t("community.learnMore")} <ArrowRight className="w-4 h-4" />
                       </span>
                     </Link>
                   </motion.div>
@@ -176,14 +136,14 @@ export default function Community() {
               viewport={{ once: true }}
               className="font-serif text-2xl md:text-3xl font-semibold mb-10"
             >
-              How we work
+              {t("community.howWeWork")}
             </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {principles.map((principle, i) => {
                 const Icon = principle.icon;
                 return (
                   <motion.div
-                    key={principle.title}
+                    key={principle.titleKey}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -193,8 +153,8 @@ export default function Community() {
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="font-serif text-xl font-semibold">{principle.title}</h3>
-                    <p className="text-muted-foreground">{principle.description}</p>
+                    <h3 className="font-serif text-xl font-semibold">{t(principle.titleKey)}</h3>
+                    <p className="text-muted-foreground">{t(principle.descKey)}</p>
                   </motion.div>
                 );
               })}
@@ -213,15 +173,15 @@ export default function Community() {
             >
               <div>
                 <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-2">
-                  Peer endorsements
+                  {t("community.peerVoices")}
                 </h2>
                 <p className="text-muted-foreground max-w-xl">
-                  Artists recommend each other. Here’s what the community is saying.
+                  {t("community.peerVoicesDesc")}
                 </p>
               </div>
               <Link to="/artists">
                 <Button variant="outline" className="gap-2">
-                  Browse artists <ArrowRight className="w-4 h-4" />
+                  {t("community.browseArtists")} <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </motion.div>
@@ -275,20 +235,19 @@ export default function Community() {
             >
               <Heart className="w-10 h-10 text-primary mx-auto mb-4" />
               <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-3">
-                Join the community
+                {t("community.joinTitle")}
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-                Follow artists, explore trusted recommendations, and discover work
-                through people you admire.
+                {t("community.joinDesc")}
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link to="/discover">
                   <Button className="gap-2">
-                    Discover art <ArrowRight className="w-4 h-4" />
+                    {t("community.discoverArt")} <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
                 <Link to="/artists">
-                  <Button variant="outline">View artists</Button>
+                  <Button variant="outline">{t("community.viewArtists")}</Button>
                 </Link>
               </div>
             </motion.div>

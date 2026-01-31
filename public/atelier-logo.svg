@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 36" fill="none">
+  <!-- Icon: elegant "A" lettermark -->
+  <path d="M18 32L10 8h3.5l4 14 4-14h3.5L27 32h-3l-1-4h-4l-1 4h-3zm5-7h3l-1.5-6-1.5 6z" fill="hsl(12, 45%, 45%)"/>
+  <!-- Wordmark -->
+  <text x="44" y="26" font-family="Cormorant Garamond, Georgia, serif" font-size="24" font-weight="600" fill="hsl(12, 45%, 45%)">Atelier</text>
+</svg>

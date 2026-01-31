@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Heart, Bookmark, Users, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ const ArtworkCard = ({
   delay = 0,
 }: ArtworkCardProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user, isFavorite, toggleFavorite, isLiked, toggleLike } = useAuth();
   const isFav = isFavorite(artworkId);
   const liked = isLiked(artworkId);
@@ -200,9 +201,17 @@ const ArtworkCard = ({
         {!user && (
           <div className="mt-4 pt-4 border-t border-border">
             <p className="text-xs text-muted-foreground text-center">
-              <Link to="/login" className="text-primary hover:underline">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate("/login");
+                }}
+                className="text-primary hover:underline bg-transparent border-0 cursor-pointer p-0 font-inherit"
+              >
                 {t("artworkCard.signInToLike")}
-              </Link>
+              </button>
             </p>
           </div>
         )}

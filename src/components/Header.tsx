@@ -30,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import SearchDialog from "@/components/SearchDialog";
+import Logo from "@/components/Logo";
 import NotificationsDropdown from "@/components/NotificationsDropdown";
 import AuthDialog from "@/components/AuthDialog";
 import i18n from "@/i18n";
@@ -90,10 +91,7 @@ const Header = () => {
     return (
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
-            <div className="w-8 h-8 rounded-full gradient-trust" />
-            <span className="font-serif text-lg sm:text-xl font-semibold">{t("common.appName")}</span>
-          </Link>
+          <Logo />
           <div className="flex items-center gap-2">
             <Select value={currentLang} onValueChange={handleLanguageChange}>
               <SelectTrigger className="w-[100px] sm:w-[120px] h-9 border-border" aria-label="Language">
@@ -125,10 +123,7 @@ const Header = () => {
     <TooltipProvider>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
-            <div className="w-8 h-8 rounded-full gradient-trust" />
-            <span className="font-serif text-lg sm:text-xl font-semibold">{t("common.appName")}</span>
-          </Link>
+          <Logo />
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
