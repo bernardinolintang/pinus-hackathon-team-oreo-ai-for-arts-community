@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
 import { Hash, TrendingUp } from "lucide-react";
 import type { TrendingKeyword } from "@/data/trending";
+import type { TFunction } from "i18next";
 
 interface TrendingKeywordCardProps {
   keyword: TrendingKeyword;
   index: number;
+  t: TFunction;
 }
 
-const TrendingKeywordCard = ({ keyword, index }: TrendingKeywordCardProps) => {
+const TrendingKeywordCard = ({ keyword, index, t }: TrendingKeywordCardProps) => {
   const { keyword: tag, artworkCount, changePercent } = keyword;
 
   return (
@@ -24,7 +26,7 @@ const TrendingKeywordCard = ({ keyword, index }: TrendingKeywordCardProps) => {
           </span>
         </div>
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>{artworkCount} artworks</span>
+          <span>{artworkCount} {t("trending.artworksUnit")}</span>
           <span className="flex items-center gap-1 text-emerald-600 font-medium">
             <TrendingUp className="w-3.5 h-3.5" />
             +{changePercent}%

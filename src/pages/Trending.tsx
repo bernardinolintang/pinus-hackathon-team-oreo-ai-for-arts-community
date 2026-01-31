@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { TrendingUp, Clock, Sparkles, Users, Hash } from "lucide-react";
 import Header from "@/components/Header";
@@ -17,14 +18,15 @@ import {
 
 type Timeframe = "today" | "week" | "month";
 
-const timeframeOptions: { value: Timeframe; label: string; icon: React.ReactNode }[] = [
-  { value: "today", label: "Today", icon: <Clock className="w-4 h-4" /> },
-  { value: "week", label: "This Week", icon: <TrendingUp className="w-4 h-4" /> },
-  { value: "month", label: "This Month", icon: <Sparkles className="w-4 h-4" /> },
+const timeframeOptions = (t: (k: string) => string) => [
+  { value: "today" as const, labelKey: "trending.today", icon: <Clock className="w-4 h-4" /> },
+  { value: "week" as const, labelKey: "trending.thisWeek", icon: <TrendingUp className="w-4 h-4" /> },
+  { value: "month" as const, labelKey: "trending.thisMonth", icon: <Sparkles className="w-4 h-4" /> },
 ];
 
 const Trending = () => {
-  useDocumentTitle("Trending");
+  const { t } = useTranslation();
+  useDocumentTitle(t("trending.title"));
   const [timeframe, setTimeframe] = useState<Timeframe>("week");
   const [activeTab, setActiveTab] = useState("artworks");
 
@@ -60,19 +62,21 @@ const Trending = () => {
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <h1 className="font-serif text-4xl md:text-5xl font-semibold">
-                Trending
+                {t("trending.title")}
               </h1>
             </div>
             <p className="text-lg text-muted-foreground">
-              See what the community is engaging with the most. Unlike viral content elsewhere,
-              these trends are based on <span className="text-foreground font-medium">peer validation</span> and{" "}
-              <span className="text-foreground font-medium">trusted endorsements</span>, not just raw popularity.
+              {t("trending.description")}{" "}
+              <span className="text-foreground font-medium">{t("trending.peerValidation")}</span>{" "}
+              and{" "}
+              <span className="text-foreground font-medium">{t("trending.trustedEndorsements")}</span>,{" "}
+              {t("trending.descriptionEnd")}
             </p>
           </motion.div>
 
           {/* Timeframe Selector */}
           <div className="flex flex-wrap gap-2 mb-8">
-            {timeframeOptions.map((option) => (
+            {timeframeOptions(t).map((option) => (
               <Button
                 key={option.value}
                 variant={timeframe === option.value ? "default" : "outline"}
@@ -80,7 +84,7 @@ const Trending = () => {
                 className="gap-2"
               >
                 {option.icon}
-                {option.label}
+                {t(option.labelKey)}
               </Button>
             ))}
           </div>
@@ -90,15 +94,15 @@ const Trending = () => {
             <TabsList className="bg-muted/50">
               <TabsTrigger value="artworks" className="gap-2">
                 <Sparkles className="w-4 h-4" />
-                Artworks
+                {t("trending.artworks")}
               </TabsTrigger>
               <TabsTrigger value="artists" className="gap-2">
                 <Users className="w-4 h-4" />
-                Artists
+                {t("trending.artists")}
               </TabsTrigger>
               <TabsTrigger value="keywords" className="gap-2">
                 <Hash className="w-4 h-4" />
-                Keywords
+                {t("trending.keywords")}
               </TabsTrigger>
             </TabsList>
 
@@ -106,10 +110,10 @@ const Trending = () => {
             <TabsContent value="artworks" className="space-y-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  {filteredArtworks.length} trending artwork{filteredArtworks.length !== 1 ? "s" : ""}
+                  {t("trending.trendingArtworksCount", { count: filteredArtworks.length })}
                 </p>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="hidden sm:inline">Ranked by peer appreciation & trust signals</span>
+                  <span className="hidden sm:inline">{t("trending.rankedBy")}</span>
                 </div>
               </div>
 
@@ -121,13 +125,14 @@ const Trending = () => {
                       artwork={artwork}
                       index={index}
                       rank={index + 1}
+                      t={t}
                     />
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-16">
                   <p className="text-lg text-muted-foreground">
-                    No trending artworks for this timeframe yet.
+                    {t("trending.noArtworks")}
                   </p>
                 </div>
               )}
@@ -137,20 +142,20 @@ const Trending = () => {
             <TabsContent value="artists" className="space-y-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  {filteredArtists.length} trending artist{filteredArtists.length !== 1 ? "s" : ""}
+                  {t("trending.trendingArtistsCount", { count: filteredArtists.length })}
                 </p>
               </div>
 
               {filteredArtists.length > 0 ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {filteredArtists.map((artist, index) => (
-                    <TrendingArtistCard key={artist.id} artist={artist} index={index} />
+                    <TrendingArtistCard key={artist.id} artist={artist} index={index} t={t} />
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-16">
                   <p className="text-lg text-muted-foreground">
-                    No trending artists for this timeframe yet.
+                    {t("trending.noArtists")}
                   </p>
                 </div>
               )}
@@ -160,20 +165,20 @@ const Trending = () => {
             <TabsContent value="keywords" className="space-y-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  {filteredKeywords.length} trending keyword{filteredKeywords.length !== 1 ? "s" : ""}
+                  {t("trending.trendingKeywordsCount", { count: filteredKeywords.length })}
                 </p>
               </div>
 
               {filteredKeywords.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredKeywords.map((keyword, index) => (
-                    <TrendingKeywordCard key={keyword.id} keyword={keyword} index={index} />
+                    <TrendingKeywordCard key={keyword.id} keyword={keyword} index={index} t={t} />
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-16">
                   <p className="text-lg text-muted-foreground">
-                    No trending keywords for this timeframe yet.
+                    {t("trending.noKeywords")}
                   </p>
                 </div>
               )}
@@ -189,24 +194,23 @@ const Trending = () => {
             className="mt-16 p-6 bg-muted/30 rounded-2xl border border-border"
           >
             <h2 className="font-serif text-xl font-semibold mb-3">
-              How Trending Works
+              {t("trending.howItWorksTitle")}
             </h2>
             <p className="text-muted-foreground mb-4">
-              Our trending algorithm prioritizes quality over virality. Instead of simply counting likes,
-              we weight engagement based on:
+              {t("trending.howItWorksIntro")}
             </p>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-trust mt-2 flex-shrink-0" />
-                <span><strong className="text-foreground">Peer validation:</strong> Appreciation from verified artists and long-term community members carries more weight.</span>
+                <span><strong className="text-foreground">{t("trending.peerValidationBullet")}</strong> {t("trending.peerValidationText")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-trust mt-2 flex-shrink-0" />
-                <span><strong className="text-foreground">Curator endorsements:</strong> Works featured in peer-curated collections signal trusted quality.</span>
+                <span><strong className="text-foreground">{t("trending.curatorEndorsementsBullet")}</strong> {t("trending.curatorEndorsementsText")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-trust mt-2 flex-shrink-0" />
-                <span><strong className="text-foreground">Organic growth:</strong> Steady, sustained engagement is valued over sudden spikes that may indicate manipulation.</span>
+                <span><strong className="text-foreground">{t("trending.organicGrowthBullet")}</strong> {t("trending.organicGrowthText")}</span>
               </li>
             </ul>
           </motion.div>

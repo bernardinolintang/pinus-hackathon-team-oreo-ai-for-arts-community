@@ -3,13 +3,15 @@ import { motion } from "framer-motion";
 import { Users, Award, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { TrendingArtist } from "@/data/trending";
+import type { TFunction } from "i18next";
 
 interface TrendingArtistCardProps {
   artist: TrendingArtist;
   index: number;
+  t: TFunction;
 }
 
-const TrendingArtistCard = ({ artist, index }: TrendingArtistCardProps) => {
+const TrendingArtistCard = ({ artist, index, t }: TrendingArtistCardProps) => {
   const { id, name, avatar, specialty, trendReason, followersCount, endorsementsCount } = artist;
 
   return (
@@ -38,11 +40,11 @@ const TrendingArtistCard = ({ artist, index }: TrendingArtistCardProps) => {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
-                <span>{followersCount.toLocaleString()} followers</span>
+                <span>{followersCount.toLocaleString()} {t("artists.followers")}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Award className="w-4 h-4" />
-                <span>{endorsementsCount} endorsements</span>
+                <span>{endorsementsCount} {t("artists.endorsements")}</span>
               </div>
             </div>
           </div>

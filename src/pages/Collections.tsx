@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import Header from "@/components/Header";
@@ -25,14 +26,15 @@ import {
 import { collections, themes, moods } from "@/data/collections";
 
 const sortOptions = [
-  { value: "popular", label: "Most Popular" },
-  { value: "endorsed", label: "Most Endorsed" },
-  { value: "newest", label: "Newest" },
-  { value: "artworks", label: "Most Artworks" },
+  { value: "popular", labelKey: "collections.sortPopular" },
+  { value: "endorsed", labelKey: "collections.sortEndorsed" },
+  { value: "newest", labelKey: "collections.sortNewest" },
+  { value: "artworks", labelKey: "collections.sortArtworks" },
 ];
 
 const Collections = () => {
-  useDocumentTitle("Collections");
+  const { t } = useTranslation();
+  useDocumentTitle(t("collections.title"));
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTheme, setSelectedTheme] = useState("All");
   const [selectedMood, setSelectedMood] = useState("All");
@@ -102,7 +104,7 @@ const Collections = () => {
     <div className="space-y-6">
       {/* Theme Filter */}
       <div>
-        <h3 className="font-medium mb-3">Theme</h3>
+        <h3 className="font-medium mb-3">{t("collections.theme")}</h3>
         <div className="flex flex-wrap gap-2">
           {["All", ...themes].map((theme) => (
             <Button
@@ -112,7 +114,7 @@ const Collections = () => {
               onClick={() => setSelectedTheme(theme)}
               className="text-xs"
             >
-              {theme}
+              {theme === "All" ? t("collections.all") : t(`collections.themes.${theme}`)}
             </Button>
           ))}
         </div>
@@ -120,7 +122,7 @@ const Collections = () => {
 
       {/* Mood Filter */}
       <div>
-        <h3 className="font-medium mb-3">Mood</h3>
+        <h3 className="font-medium mb-3">{t("collections.mood")}</h3>
         <div className="flex flex-wrap gap-2">
           {["All", ...moods].map((mood) => (
             <Button
@@ -130,7 +132,7 @@ const Collections = () => {
               onClick={() => setSelectedMood(mood)}
               className="text-xs"
             >
-              {mood}
+              {mood === "All" ? t("collections.all") : t(`collections.moods.${mood}`)}
             </Button>
           ))}
         </div>
@@ -151,11 +153,10 @@ const Collections = () => {
             className="max-w-2xl mb-10"
           >
             <h1 className="font-serif text-4xl md:text-5xl font-semibold mb-4">
-              Collections
+              {t("collections.title")}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Curated sets of artworks organized by themes, moods, and stories.
-              Each collection is handpicked by verified community curators.
+              {t("collections.description")}
             </p>
           </motion.div>
 
@@ -164,7 +165,7 @@ const Collections = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search collections..."
+                placeholder={t("collections.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -181,7 +182,7 @@ const Collections = () => {
                 </SheetTrigger>
                 <SheetContent side="left">
                   <SheetHeader>
-                    <SheetTitle>Filters</SheetTitle>
+                    <SheetTitle>{t("collections.filters")}</SheetTitle>
                   </SheetHeader>
                   <div className="mt-6">
                     <FilterContent />
@@ -193,13 +194,13 @@ const Collections = () => {
               <div className="hidden md:flex items-center gap-3">
                 <Select value={selectedTheme} onValueChange={setSelectedTheme}>
                   <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Theme" />
+                    <SelectValue placeholder={t("collections.theme")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="All">All</SelectItem>
+                    <SelectItem value="All">{t("collections.all")}</SelectItem>
                     {themes.map((theme) => (
                       <SelectItem key={theme} value={theme}>
-                        {theme}
+                        {t(`collections.themes.${theme}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -207,13 +208,13 @@ const Collections = () => {
 
                 <Select value={selectedMood} onValueChange={setSelectedMood}>
                   <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Mood" />
+                    <SelectValue placeholder={t("collections.mood")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="All">All</SelectItem>
+                    <SelectItem value="All">{t("collections.all")}</SelectItem>
                     {moods.map((mood) => (
                       <SelectItem key={mood} value={mood}>
-                        {mood}
+                        {t(`collections.moods.${mood}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -222,12 +223,12 @@ const Collections = () => {
 
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Sort by" />
+                  <SelectValue placeholder={t("collections.sortBy")} />
                 </SelectTrigger>
                 <SelectContent>
                   {sortOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -238,7 +239,7 @@ const Collections = () => {
           {/* Active Filters */}
           {activeFilters.length > 0 && (
             <div className="flex items-center gap-2 mb-6 flex-wrap">
-              <span className="text-sm text-muted-foreground">Active filters:</span>
+              <span className="text-sm text-muted-foreground">{t("collections.activeFilters")}</span>
               {activeFilters.map((filter) => (
                 <Badge
                   key={filter.type}
@@ -246,35 +247,35 @@ const Collections = () => {
                   className="gap-1 cursor-pointer hover:bg-secondary/80"
                   onClick={() => clearFilter(filter.type)}
                 >
-                  {filter.value}
+                  {filter.type === "theme" ? t(`collections.themes.${filter.value}`) : filter.type === "mood" ? t(`collections.moods.${filter.value}`) : filter.value}
                   <X className="w-3 h-3" />
                 </Badge>
               ))}
               <Button variant="ghost" size="sm" onClick={clearAllFilters}>
-                Clear all
+                {t("collections.clearAll")}
               </Button>
             </div>
           )}
 
           {/* Results Count */}
           <p className="text-sm text-muted-foreground mb-6">
-            Showing {filteredCollections.length} collection{filteredCollections.length !== 1 ? "s" : ""}
+            {t("collections.showingCount", { count: filteredCollections.length })}
           </p>
 
           {/* Collections Grid */}
           {filteredCollections.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCollections.map((collection, index) => (
-                <CollectionCard key={collection.id} collection={collection} index={index} />
+                <CollectionCard key={collection.id} collection={collection} index={index} t={t} />
               ))}
             </div>
           ) : (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground mb-4">
-                No collections found matching your criteria.
+                {t("collections.noCollections")}
               </p>
               <Button variant="outline" onClick={clearAllFilters}>
-                Clear filters
+                {t("collections.clearFilters")}
               </Button>
             </div>
           )}

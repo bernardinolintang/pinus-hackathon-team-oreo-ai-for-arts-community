@@ -3,14 +3,16 @@ import { motion } from "framer-motion";
 import { Users, Heart, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { TrendingArtwork } from "@/data/trending";
+import type { TFunction } from "i18next";
 
 interface TrendingArtworkCardProps {
   artwork: TrendingArtwork;
   index: number;
   rank: number;
+  t: TFunction;
 }
 
-const TrendingArtworkCard = ({ artwork, index, rank }: TrendingArtworkCardProps) => {
+const TrendingArtworkCard = ({ artwork, index, rank, t }: TrendingArtworkCardProps) => {
   const {
     id,
     image,
@@ -76,7 +78,7 @@ const TrendingArtworkCard = ({ artwork, index, rank }: TrendingArtworkCardProps)
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
-                <span>{peersCount} peers</span>
+                <span>{peersCount} {t("trending.peers")}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Heart className="w-4 h-4" />
