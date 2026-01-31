@@ -26,19 +26,6 @@ const sectionKeys = [
 
 const PRINCIPLE_KEYS = ["moderationPage.principle1", "moderationPage.principle2", "moderationPage.principle3"];
 
-// Define principles and sections for display
-const PRINCIPLES = [
-  "Transparency: All moderation decisions are explained clearly",
-  "Fairness: Every case is reviewed individually with context",
-  "Community First: We prioritize the safety and trust of our community"
-];
-
-const sections = sectionKeys.map(section => ({
-  icon: section.icon,
-  title: t(section.titleKey),
-  content: t(section.contentKey)
-}));
-
 const APPEALS_STORAGE_KEY = "atelier_appeals";
 
 function saveAppeal(payload: { caseReference?: string; description: string }) {
@@ -77,13 +64,20 @@ const Moderation = () => {
   }));
 
   const fetchApplications = useCallback(() => {
-    if (!isModerator) return;
+    if (!isModerator) {
+      console.log("Not a moderator, skipping fetch");
+      return;
+    }
     setApplicationsError(null);
     setApplicationsLoading(true);
     moderationApi
       .getArtistApplications()
-      .then(setArtistApplications)
+      .then((apps) => {
+        console.log("Fetched applications:", apps);
+        setArtistApplications(apps);
+      })
       .catch((e) => {
+        console.error("Error fetching applications:", e);
         const msg = getUserMessage(e, "moderation");
         setApplicationsError(msg);
         toast.error(msg);
@@ -92,7 +86,10 @@ const Moderation = () => {
   }, [isModerator]);
 
   useEffect(() => {
-    if (isModerator) fetchApplications();
+    console.log("Moderation page - isModerator:", isModerator, "user:", user);
+    if (isModerator) {
+      fetchApplications();
+    }
   }, [isModerator, user?.id, fetchApplications]);
 
   const handleApprove = async (userId: string) => {

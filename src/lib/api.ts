@@ -195,6 +195,7 @@ function ensureDemoModerator(): void {
 
 // Restore mock state on load so existing auth_token is recognized
 loadMockState();
+// Always ensure demo moderator exists (even if loaded from state, verify it's correct)
 ensureDemoModerator();
 
 const apiRequest = async <T>(
