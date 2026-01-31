@@ -15,44 +15,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { moderationApi, MODERATOR_EMAIL, type ArtistApplication } from "@/lib/api";
 import { getUserMessage } from "@/lib/errors";
 
-const sections = [
-  {
-    icon: Scale,
-    title: "Ethical moderation",
-    content: "We moderate content to keep the community safe and respectful while preserving free expression. Our approach is consistent, transparent, and aligned with our Community Guidelines. We do not favour engagement over safety.",
-  },
-  {
-    icon: Eye,
-    title: "How content is reviewed",
-    content: "Reports from the community are reviewed by our team. We consider context, intent, and impact. Action may include a warning, content removal, or account restrictions. We aim to be fair and proportionate.",
-  },
-  {
-    icon: Flag,
-    title: "How to report",
-    content: "Use the Report button on artwork and artist profile pages. Choose a reason (harassment, hate speech, misrepresentation, manipulation, or other) and add a brief description so we can act appropriately. Reports are reviewed by our team.",
-  },
-  {
-    icon: RefreshCw,
-    title: "Appeals",
-    content: "If you believe a decision was made in error, you can appeal. We will re-review the case and respond. Our goal is a community where artists and collectors can participate without abuse or manipulation.",
-  },
-  {
-    icon: Mail,
-    title: "Contact",
-    content: "For urgent safety concerns or questions about moderation, contact us through the Contact page. We take safety seriously and aim to respond to reports in a timely manner.",
-  },
-  {
-    icon: FileText,
-    title: "Alignment with community trust",
-    content: "Moderation supports social validation and community-driven trust. By addressing harmful behaviour, we protect the space for peer learning, endorsements, and genuine engagement. Art stays about appreciation, not speculation or abuse.",
-  },
+const sectionKeys = [
+  { icon: Scale, titleKey: "moderationPage.ethicalModeration", contentKey: "moderationPage.ethicalModerationContent" },
+  { icon: Eye, titleKey: "moderationPage.howReviewed", contentKey: "moderationPage.howReviewedContent" },
+  { icon: Flag, titleKey: "moderationPage.howToReport", contentKey: "moderationPage.howToReportContent" },
+  { icon: RefreshCw, titleKey: "moderationPage.appeals", contentKey: "moderationPage.appealsContent" },
+  { icon: Mail, titleKey: "moderationPage.contact", contentKey: "moderationPage.contactContent" },
+  { icon: FileText, titleKey: "moderationPage.alignmentTrust", contentKey: "moderationPage.alignmentTrustContent" },
 ];
 
-const PRINCIPLES = [
-  "Consistent: same standards applied to everyone",
-  "Transparent: we explain how we review and act",
-  "Safety over engagement: we never favour engagement over safety",
-];
+const PRINCIPLE_KEYS = ["moderationPage.principle1", "moderationPage.principle2", "moderationPage.principle3"];
 
 const APPEALS_STORAGE_KEY = "atelier_appeals";
 
@@ -126,17 +98,17 @@ const Moderation = () => {
   const handleAppealSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!appealDescription.trim()) {
-      toast.error("Please describe why you believe the decision was wrong.");
+      toast.error(t("moderationPage.toastAppealDesc"));
       return;
     }
     setAppealSubmitting(true);
     try {
       saveAppeal({ caseReference: caseReference.trim() || undefined, description: appealDescription.trim() });
-      toast.success("Appeal submitted. We will re-review the case and respond.");
+      toast.success(t("moderationPage.toastAppealSuccess"));
       setCaseReference("");
       setAppealDescription("");
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("moderationPage.toastAppealFailed"));
     } finally {
       setAppealSubmitting(false);
     }

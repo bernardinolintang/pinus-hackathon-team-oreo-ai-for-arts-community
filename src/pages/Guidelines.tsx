@@ -1,38 +1,20 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Heart, MessageCircle, Shield, AlertCircle, FileText } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const sections = [
-  {
-    icon: Heart,
-    title: "Respectful interaction",
-    content: "Treat artists, collectors, and curators with respect. Constructive feedback and genuine appreciation build the community. Harassment, hate speech, or personal attacks are not tolerated.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Constructive engagement",
-    content: "Comments and endorsements should be thoughtful and relevant. Share what you appreciate about the work or how it resonates with you. Peer learning thrives when conversations are substantive.",
-  },
-  {
-    icon: Shield,
-    title: "Trust and transparency",
-    content: "We surface peer endorsements, reputation, and trust signals so you can make informed choices. Do not manipulate engagement, fake endorsements, or misrepresent your identity or work.",
-  },
-  {
-    icon: AlertCircle,
-    title: "Reporting and moderation",
-    content: "If you see content or behaviour that violates these guidelines, report it. We review reports and take action to keep the community safe. See our Moderation and Trust & Safety pages for how we handle reports.",
-  },
-  {
-    icon: FileText,
-    title: "Art and authenticity",
-    content: "We encourage participation without turning art into a purely speculative asset. Share and discover work you value. Community-driven trust and social validation matter more than raw popularity.",
-  },
+const sectionKeys = [
+  { icon: Heart, titleKey: "guidelines.respectful", contentKey: "guidelines.respectfulContent" },
+  { icon: MessageCircle, titleKey: "guidelines.constructive", contentKey: "guidelines.constructiveContent" },
+  { icon: Shield, titleKey: "guidelines.trustTransparency", contentKey: "guidelines.trustTransparencyContent" },
+  { icon: AlertCircle, titleKey: "guidelines.reporting", contentKey: "guidelines.reportingContent" },
+  { icon: FileText, titleKey: "guidelines.artAuthenticity", contentKey: "guidelines.artAuthenticityContent" },
 ];
 
 const Guidelines = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -44,18 +26,18 @@ const Guidelines = () => {
             transition={{ duration: 0.4 }}
           >
             <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-4">
-              Community Guidelines
+              {t("guidelines.title")}
             </h1>
             <p className="text-muted-foreground mb-10">
-              Learn how to participate respectfully and constructively in the Atelier community. These guidelines support social validation, peer learning, and community-driven trust.
+              {t("guidelines.intro")}
             </p>
 
             <div className="space-y-8">
-              {sections.map((section, i) => {
+              {sectionKeys.map((section, i) => {
                 const Icon = section.icon;
                 return (
                   <motion.div
-                    key={section.title}
+                    key={section.titleKey}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -66,8 +48,8 @@ const Guidelines = () => {
                       <Icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h2 className="font-serif text-xl font-semibold mb-2">{section.title}</h2>
-                      <p className="text-muted-foreground leading-relaxed">{section.content}</p>
+                      <h2 className="font-serif text-xl font-semibold mb-2">{t(section.titleKey)}</h2>
+                      <p className="text-muted-foreground leading-relaxed">{t(section.contentKey)}</p>
                     </div>
                   </motion.div>
                 );
@@ -76,15 +58,15 @@ const Guidelines = () => {
 
             <div className="mt-12 p-6 rounded-2xl bg-card border border-border">
               <p className="text-sm text-muted-foreground mb-4">
-                For how we enforce these guidelines and keep the platform safe, see:
+                {t("guidelines.enforceIntro")}
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link to="/trust">
-                  <span className="text-primary font-medium hover:underline">Trust & Safety</span>
+                  <span className="text-primary font-medium hover:underline">{t("footer.trust")}</span>
                 </Link>
                 <span className="text-muted-foreground">·</span>
                 <Link to="/moderation">
-                  <span className="text-primary font-medium hover:underline">Moderation</span>
+                  <span className="text-primary font-medium hover:underline">{t("footer.moderation")}</span>
                 </Link>
               </div>
             </div>

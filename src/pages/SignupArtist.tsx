@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import Header from "@/components/Header";
 import { Palette } from "lucide-react";
 
 const SignupArtist = () => {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,12 +23,12 @@ const SignupArtist = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("signupArtist.toastPasswordsMatch"));
       return;
     }
 
     if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+      toast.error(t("signupArtist.toastPasswordLength"));
       return;
     }
 
@@ -34,10 +36,10 @@ const SignupArtist = () => {
 
     try {
       await signup(email, password, name, true);
-      toast.success("Account created! Your artist request has been sent for moderator approval. We'll notify you once approved.");
+      toast.success(t("signupArtist.toastSuccess"));
       // Navigation happens in AuthContext after signup
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create account");
+      toast.error(error instanceof Error ? error.message : t("signupArtist.toastFailed"));
       setLoading(false);
     }
   };
@@ -50,16 +52,16 @@ const SignupArtist = () => {
           <CardHeader className="space-y-1">
             <div className="flex items-center gap-2">
               <Palette className="w-6 h-6 text-primary" />
-              <CardTitle className="text-2xl font-serif">Register as an artist</CardTitle>
+              <CardTitle className="text-2xl font-serif">{t("signupArtist.title")}</CardTitle>
             </div>
             <CardDescription>
-              Create an account and submit a request to become an artist. A moderator will review and approve your request. Once approved, you can post artworks and see who liked and commented on your work.
+              {t("signupArtist.description")}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t("signupArtist.fullName")}</Label>
                 <Input
                   id="name"
                   type="text"
@@ -71,7 +73,7 @@ const SignupArtist = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("login.email")}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -83,7 +85,7 @@ const SignupArtist = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("login.password")}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -95,7 +97,7 @@ const SignupArtist = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">{t("signupArtist.confirmPassword")}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -109,18 +111,18 @@ const SignupArtist = () => {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Creating account..." : "Register as artist"}
+                {loading ? t("signupArtist.creating") : t("signupArtist.register")}
               </Button>
               <p className="text-sm text-center text-muted-foreground">
-                Want a regular account instead?{" "}
+                {t("signupArtist.wantRegular")}{" "}
                 <Link to="/signup" className="text-primary hover:underline">
-                  Sign up without artist request
+                  {t("signupArtist.signupWithout")}
                 </Link>
               </p>
               <p className="text-sm text-center text-muted-foreground">
-                Already have an account?{" "}
+                {t("signupArtist.alreadyHave")}{" "}
                 <Link to="/login" className="text-primary hover:underline">
-                  Sign in
+                  {t("common.signIn")}
                 </Link>
               </p>
             </CardFooter>
