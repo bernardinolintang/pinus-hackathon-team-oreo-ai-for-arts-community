@@ -26,6 +26,19 @@ const sectionKeys = [
 
 const PRINCIPLE_KEYS = ["moderationPage.principle1", "moderationPage.principle2", "moderationPage.principle3"];
 
+// Define principles and sections for display
+const PRINCIPLES = [
+  "Transparency: All moderation decisions are explained clearly",
+  "Fairness: Every case is reviewed individually with context",
+  "Community First: We prioritize the safety and trust of our community"
+];
+
+const sections = sectionKeys.map(section => ({
+  icon: section.icon,
+  title: t(section.titleKey),
+  content: t(section.contentKey)
+}));
+
 const APPEALS_STORAGE_KEY = "atelier_appeals";
 
 function saveAppeal(payload: { caseReference?: string; description: string }) {
@@ -49,6 +62,19 @@ const Moderation = () => {
   const [applicationsError, setApplicationsError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const isModerator = user?.email === MODERATOR_EMAIL;
+
+  // Define principles and sections for display (using translation)
+  const PRINCIPLES = [
+    t("moderationPage.principle1") || "Transparency: All moderation decisions are explained clearly",
+    t("moderationPage.principle2") || "Fairness: Every case is reviewed individually with context",
+    t("moderationPage.principle3") || "Community First: We prioritize the safety and trust of our community"
+  ];
+
+  const sections = sectionKeys.map(section => ({
+    icon: section.icon,
+    title: t(section.titleKey),
+    content: t(section.contentKey)
+  }));
 
   const fetchApplications = useCallback(() => {
     if (!isModerator) return;
@@ -186,7 +212,7 @@ const Moderation = () => {
                           <Button
                             size="sm"
                             onClick={() => handleApprove(app.userId)}
-                            disabled={processingId !== null}
+                            disabled={processingId === app.userId}
                           >
                             <Check className="w-4 h-4 mr-1 shrink-0" />
                             {t("moderation.approve")}
@@ -195,7 +221,7 @@ const Moderation = () => {
                             size="sm"
                             variant="destructive"
                             onClick={() => handleReject(app.userId)}
-                            disabled={processingId !== null}
+                            disabled={processingId === app.userId}
                           >
                             <X className="w-4 h-4 mr-1 shrink-0" />
                             {t("moderation.reject")}

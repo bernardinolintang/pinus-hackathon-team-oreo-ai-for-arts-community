@@ -21,7 +21,6 @@ const Footer = () => {
               <li><Link to="/guidelines" className="hover:text-foreground transition-colors">{t("footer.guidelines")}</Link></li>
               <li><Link to="/trust" className="hover:text-foreground transition-colors">{t("footer.trust")}</Link></li>
               <li><Link to="/moderation" className="hover:text-foreground transition-colors">{t("footer.moderation")}</Link></li>
-              <li><Link to="/contact" className="hover:text-foreground transition-colors">{t("footer.contact")}</Link></li>
               <li><Link to="/faq" className="hover:text-foreground transition-colors">{t("footer.faq")}</Link></li>
             </ul>
           </div>
