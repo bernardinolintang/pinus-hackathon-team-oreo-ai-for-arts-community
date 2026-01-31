@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Search, Bell, User, LogOut, Settings, Bookmark, Menu, X, ShieldCheck, Palette, ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Search, Bell, User, LogOut, Settings, Bookmark, Menu, ShieldCheck, Palette, ArrowLeft, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +17,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -24,9 +32,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import SearchDialog from "@/components/SearchDialog";
 import NotificationsDropdown from "@/components/NotificationsDropdown";
 import AuthDialog from "@/components/AuthDialog";
+import i18n from "@/i18n";
+import { SUPPORTED_LANGUAGES } from "@/i18n";
 
 const Header = () => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
+  const currentLang = (["en", "zh", "id"] as const).find((l) => i18n.language?.startsWith(l)) || "en";
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -69,24 +81,41 @@ const Header = () => {
       .slice(0, 2);
   };
 
+  const handleLanguageChange = (code: string) => {
+    i18n.changeLanguage(code);
+  };
+
   // Minimal header for auth pages
   if (isAuthPage) {
     return (
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
             <div className="w-8 h-8 rounded-full gradient-trust" />
-            <span className="font-serif text-xl font-semibold">Atelier</span>
+            <span className="font-serif text-lg sm:text-xl font-semibold">{t("common.appName")}</span>
           </Link>
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 font-medium shadow-sm hover:shadow-md transition-shadow"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back
-          </Button>
+          <div className="flex items-center gap-2">
+            <Select value={currentLang} onValueChange={handleLanguageChange}>
+              <SelectTrigger className="w-[100px] sm:w-[120px] h-9 border-border" aria-label="Language">
+                <Languages className="w-4 h-4 mr-1 shrink-0" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SUPPORTED_LANGUAGES.map(({ code, label }) => (
+                  <SelectItem key={code} value={code}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="default"
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 font-medium shadow-sm hover:shadow-md transition-shadow shrink-0"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="hidden sm:inline">{t("common.back")}</span>
+            </Button>
+          </div>
         </div>
       </header>
     );
@@ -95,20 +124,20 @@ const Header = () => {
   return (
     <TooltipProvider>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
             <div className="w-8 h-8 rounded-full gradient-trust" />
-            <span className="font-serif text-xl font-semibold">Atelier</span>
+            <span className="font-serif text-lg sm:text-xl font-semibold">{t("common.appName")}</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
             <Link 
               to="/discover" 
               onClick={(e) => handleNavClick(e, "/discover")}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
-              Discover
+              {t("nav.discover")}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
             <Link 
@@ -116,7 +145,7 @@ const Header = () => {
               onClick={(e) => handleNavClick(e, "/artists")}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
-              Artists
+              {t("nav.artists")}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
             <Link 
@@ -124,7 +153,7 @@ const Header = () => {
               onClick={(e) => handleNavClick(e, "/collections")}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
-              Collections
+              {t("nav.collections")}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
             <Link 
@@ -132,7 +161,7 @@ const Header = () => {
               onClick={(e) => handleNavClick(e, "/trending")}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
-              Trending
+              {t("nav.trending")}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
             {user && user.artistApplicationStatus !== "approved" && (
@@ -140,17 +169,28 @@ const Header = () => {
                 asChild
                 variant="outline"
                 size="sm"
-                className="ml-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                className="ml-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               >
                 <Link to="/artist/register" className="flex items-center gap-2">
                   <Palette className="w-4 h-4" />
-                  Become an Artist
+                  {t("nav.becomeArtist")}
                 </Link>
               </Button>
             )}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Select value={currentLang} onValueChange={handleLanguageChange}>
+              <SelectTrigger className="w-[90px] sm:w-[110px] h-9 border-border" aria-label="Language">
+                <Languages className="w-4 h-4 mr-1 shrink-0 hidden sm:inline" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SUPPORTED_LANGUAGES.map(({ code, label }) => (
+                  <SelectItem key={code} value={code}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {/* Mobile: Become an Artist button (visible when logged in) */}
             {user && user.artistApplicationStatus !== "approved" && (
               <Button
@@ -221,49 +261,49 @@ const Header = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
-                    Profile
+                    {t("nav.profile")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/favorites" className="cursor-pointer">
                     <Bookmark className="mr-2 h-4 w-4" />
-                    Favorites
+                    {t("nav.favorites")}
                   </Link>
                 </DropdownMenuItem>
                 {user.artistApplicationStatus !== "approved" && (
                   <DropdownMenuItem asChild>
                     <Link to="/artist/register" className="cursor-pointer">
                       <Palette className="mr-2 h-4 w-4" />
-                      Become an Artist
+                      {t("nav.becomeArtist")}
                     </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
                   <Link to="/settings" className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
-                    Settings
+                    {t("nav.settings")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/moderation" className="cursor-pointer">
                     <ShieldCheck className="mr-2 h-4 w-4" />
-                    Moderation
+                    {t("nav.moderation")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                  {t("common.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" asChild>
-                <Link to="/login">Sign in</Link>
+              <Button variant="ghost" asChild size="sm" className="text-sm">
+                <Link to="/login">{t("common.signIn")}</Link>
               </Button>
-              <Button asChild>
-                <Link to="/signup">Sign up</Link>
+              <Button asChild size="sm" className="text-sm">
+                <Link to="/signup">{t("common.signUp")}</Link>
               </Button>
             </div>
           )}
@@ -275,9 +315,9 @@ const Header = () => {
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <SheetContent side="right" className="w-[min(100vw-2rem,300px)] sm:w-[400px]">
               <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
+                <SheetTitle>{t("common.menu")}</SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-4 mt-8">
                 <Link
@@ -293,7 +333,7 @@ const Header = () => {
                   }}
                   className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 >
-                  Discover
+                  {t("nav.discover")}
                 </Link>
                 <Link
                   to="/artists"
@@ -308,7 +348,7 @@ const Header = () => {
                   }}
                   className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 >
-                  Artists
+                  {t("nav.artists")}
                 </Link>
                 <Link
                   to="/collections"
@@ -338,7 +378,7 @@ const Header = () => {
                   }}
                   className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 >
-                  Trending
+                  {t("nav.trending")}
                 </Link>
                 {user && (
                   <>
@@ -348,14 +388,14 @@ const Header = () => {
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                     >
-                      Profile
+                      {t("nav.profile")}
                     </Link>
                     <Link
                       to="/favorites"
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                     >
-                      Favorites
+                      {t("nav.favorites")}
                     </Link>
                     {user.artistApplicationStatus !== "approved" && (
                       <Link
@@ -364,7 +404,7 @@ const Header = () => {
                         className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2 flex items-center gap-2"
                       >
                         <Palette className="w-4 h-4" />
-                        Become an Artist
+                        {t("nav.becomeArtist")}
                       </Link>
                     )}
                     <Link
@@ -372,14 +412,14 @@ const Header = () => {
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                     >
-                      Settings
+                      {t("nav.settings")}
                     </Link>
                     <Link
                       to="/moderation"
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                     >
-                      Moderation
+                      {t("nav.moderation")}
                     </Link>
                     <Button
                       variant="ghost"
@@ -390,7 +430,7 @@ const Header = () => {
                       className="justify-start text-red-600 hover:text-red-700"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
-                      Log out
+                      {t("common.logout")}
                     </Button>
                   </>
                 )}
@@ -398,10 +438,10 @@ const Header = () => {
                   <>
                     <div className="border-t my-2" />
                     <Button variant="outline" asChild className="w-full">
-                      <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
+                      <Link to="/login" onClick={() => setMobileMenuOpen(false)}>{t("common.signIn")}</Link>
                     </Button>
                     <Button asChild className="w-full">
-                      <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>Sign up</Link>
+                      <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>{t("common.signUp")}</Link>
                     </Button>
                   </>
                 )}

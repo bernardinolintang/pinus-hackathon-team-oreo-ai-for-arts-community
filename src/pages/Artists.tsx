@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Search, BadgeCheck, Users } from "lucide-react";
@@ -23,7 +24,8 @@ const artistCards = artists.map((a) => ({
 }));
 
 export default function Artists() {
-  useDocumentTitle("Artists");
+  const { t } = useTranslation();
+  useDocumentTitle(t("artists.title"));
   const [search, setSearch] = useState("");
   const [reputationFilter, setReputationFilter] = useState<ReputationFilter>("all");
 
@@ -47,9 +49,9 @@ export default function Artists() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main id="main-content" className="pt-24 pb-16">
-        <section className="py-16 md:py-20 border-b border-border">
-          <div className="container mx-auto px-6">
+      <main id="main-content" className="pt-20 sm:pt-24 pb-12 md:pb-16">
+        <section className="py-12 sm:py-16 md:py-20 border-b border-border">
+          <div className="container mx-auto px-4 sm:px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -57,22 +59,21 @@ export default function Artists() {
               className="max-w-2xl"
             >
               <div className="flex items-center gap-2 text-primary mb-3">
-                <BadgeCheck className="w-5 h-5" />
-                <span className="text-sm font-medium">Human-verified</span>
+                <BadgeCheck className="w-5 h-5 shrink-0" />
+                <span className="text-sm font-medium">{t("artists.humanVerified")}</span>
               </div>
-              <h1 className="font-serif text-4xl md:text-5xl font-semibold mb-4">
-                Artists
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-semibold mb-3 sm:mb-4">
+                {t("artists.title")}
               </h1>
-              <p className="text-lg text-muted-foreground">
-                Browse verified artists. Everyone here has been reviewed by moderators.
-                Reputation grows through peer recognition and consistent quality.
+              <p className="text-base sm:text-lg text-muted-foreground">
+                {t("artists.subtitle")}
               </p>
             </motion.div>
           </div>
         </section>
 
-        <section className="py-12">
-          <div className="container mx-auto px-6">
+        <section className="py-8 sm:py-12">
+          <div className="container mx-auto px-4 sm:px-6">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -122,12 +123,12 @@ export default function Artists() {
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
                   <Users className="w-10 h-10 text-muted-foreground" />
                 </div>
-                <h3 className="font-serif text-xl font-semibold mb-2">No artists match your filters</h3>
-                <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                  Try different search terms or clear filters to see all verified artists.
+                <h3 className="font-serif text-lg sm:text-xl font-semibold mb-2">{t("artists.noMatch")}</h3>
+                <p className="text-muted-foreground mb-6 max-w-sm mx-auto text-sm sm:text-base">
+                  {t("artists.noMatchHint")}
                 </p>
                 <Button variant="outline" onClick={() => { setSearch(""); setReputationFilter("all"); }}>
-                  Clear filters
+                  {t("common.clearFilters")}
                 </Button>
               </motion.div>
             ) : (

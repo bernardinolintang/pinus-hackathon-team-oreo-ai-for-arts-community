@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import DiscoverSection from "@/components/DiscoverSection";
@@ -15,6 +16,7 @@ import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Index = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
@@ -55,22 +57,20 @@ const Index = () => {
       <RecommendationSection />
       <ArtistsSection />
       <PrinciplesSection />
-      {/* Bottom call-to-action so visitors see a clear next step after scrolling */}
-      <section className="py-16 border-t border-border bg-background">
-        <div className="container mx-auto px-6 text-center max-w-3xl">
-          <h2 className="font-serif text-3xl md:text-4xl font-semibold mb-4">
-            Loved what you see?
+      <section className="py-12 sm:py-16 border-t border-border bg-background">
+        <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4">
+            {t("hero.ctaHeading")}
           </h2>
-          <p className="text-muted-foreground mb-6">
-            Dive into the full marketplace to explore hundreds of pieces and
-            follow the artists that inspire you most.
+          <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
+            {t("hero.ctaSubtitle")}
           </p>
           <Button 
             onClick={handleStartExploring}
             size="lg" 
-            className="mt-4 gradient-trust text-primary-foreground px-8 shadow-card hover:shadow-hover"
+            className="mt-4 gradient-trust text-primary-foreground px-6 sm:px-8 shadow-card hover:shadow-hover"
           >
-            Start Exploring
+            {t("hero.cta")}
           </Button>
         </div>
       </section>

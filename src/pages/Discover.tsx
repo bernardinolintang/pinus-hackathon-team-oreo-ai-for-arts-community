@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Search, SlidersHorizontal, X, ChevronDown, Heart, Bookmark, MessageCircle } from "lucide-react";
@@ -216,6 +217,7 @@ const Discover = () => {
   const [minPeerLikes, setMinPeerLikes] = useState<number>(0);
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const { t } = useTranslation();
 
   // Read search query from URL on mount
   useEffect(() => {
@@ -409,21 +411,19 @@ const Discover = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main id="main-content" className="pt-24 pb-16">
-        <div className="container mx-auto px-6">
-          {/* Page Header */}
+      <main id="main-content" className="pt-20 sm:pt-24 pb-12 md:pb-16">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-2xl mb-8"
+            className="max-w-2xl mb-6 sm:mb-8"
           >
-            <h1 className="font-serif text-4xl md:text-5xl font-semibold mb-4">
-              Discover Art
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-semibold mb-3 sm:mb-4">
+              {t("discover.title")}
             </h1>
-            <p className="text-lg text-muted-foreground">
-              Explore artworks validated by your peers and the wider community.
-              Every piece comes with context about why it resonates.
+            <p className="text-base sm:text-lg text-muted-foreground">
+              {t("discover.subtitle")}
             </p>
           </motion.div>
 
@@ -616,12 +616,12 @@ const Discover = () => {
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                     <Search className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <h3 className="font-serif text-xl font-semibold mb-2">No artworks found</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Try adjusting your filters or search terms
+                  <h3 className="font-serif text-lg sm:text-xl font-semibold mb-2">{t("discover.noResults")}</h3>
+                  <p className="text-muted-foreground mb-4 text-sm sm:text-base">
+                    {t("discover.noResultsHint")}
                   </p>
                   <Button variant="outline" onClick={clearAllFilters}>
-                    Clear all filters
+                    {t("discover.clearAllFilters")}
                   </Button>
                 </motion.div>
               )}

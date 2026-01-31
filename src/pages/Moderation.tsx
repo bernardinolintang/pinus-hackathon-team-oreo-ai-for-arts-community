@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Scale, Flag, Eye, RefreshCw, Mail, FileText, CheckCircle2, Palette, Check, X } from "lucide-react";
 import { toast } from "sonner";
@@ -66,6 +67,7 @@ function saveAppeal(payload: { caseReference?: string; description: string }) {
 }
 
 const Moderation = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [caseReference, setCaseReference] = useState("");
   const [appealDescription, setAppealDescription] = useState("");
@@ -143,37 +145,37 @@ const Moderation = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main id="main-content" className="pt-24 pb-16">
-        <div className="container mx-auto px-6 max-w-3xl">
+      <main id="main-content" className="pt-20 sm:pt-24 pb-12 md:pb-16">
+        <div className="container mx-auto px-4 sm:px-6 max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-4">
-              Moderation
+            <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4">
+              {t("moderation.title")}
             </h1>
-            <p className="text-muted-foreground mb-6">
-              Learn how content is reviewed and how we handle reports from the community. Ethical moderation helps keep Atelier a place for meaningful interaction and trust.
+            <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
+              {t("moderation.description")}
             </p>
 
             {!isModerator && (
-              <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
+              <div className="mb-6 sm:mb-8 rounded-xl border border-primary/20 bg-primary/5 p-3 sm:p-4 text-sm">
                 <p className="text-muted-foreground">
-                  Artist applications are reviewed by the moderation team. <strong className="text-foreground">Judges:</strong> sign in with the demo moderator account (<span className="font-mono text-foreground">demo@email.com</span> / <span className="font-mono text-foreground">demo</span>) to try approving applications. <Link to="/login" className="text-primary hover:underline font-medium">Sign in as moderator</Link>
+                  {t("moderation.demoBlock")} <Link to="/login" className="text-primary hover:underline font-medium">{t("moderation.signInModerator")}</Link>
                 </p>
               </div>
             )}
 
             {/* Artist applications (moderator only) */}
             {isModerator && (
-              <div className="mb-10 p-6 rounded-2xl bg-card border border-border">
-                <h2 className="font-serif text-xl font-semibold mb-2 flex items-center gap-2">
-                  <Palette className="w-5 h-5 text-primary" />
-                  Artist applications
+              <div className="mb-8 sm:mb-10 p-4 sm:p-6 rounded-2xl bg-card border border-border">
+                <h2 className="font-serif text-lg sm:text-xl font-semibold mb-2 flex items-center gap-2">
+                  <Palette className="w-5 h-5 text-primary shrink-0" />
+                  {t("moderation.artistApplications")}
                 </h2>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Approve or reject requests from users who want to register as artists. Approved users can post artworks and see who liked and commented on their work.
+                  {t("moderation.artistApplicationsDesc")}
                 </p>
                 {applicationsLoading ? (
                   <ul className="space-y-3" role="status" aria-live="polite" aria-busy="true">
@@ -199,23 +201,23 @@ const Moderation = () => {
                     </Button>
                   </div>
                 ) : artistApplications.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No pending artist applications.</p>
+                  <p className="text-sm text-muted-foreground">{t("moderation.noPending")}</p>
                 ) : (
                   <ul className="space-y-3">
                     {artistApplications.map((app) => (
-                      <li key={app.userId} className="flex items-center justify-between gap-4 p-3 rounded-lg border border-border bg-muted/30">
-                        <div>
-                          <p className="font-medium">{app.name}</p>
-                          <p className="text-sm text-muted-foreground">{app.email}</p>
+                      <li key={app.userId} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 rounded-lg border border-border bg-muted/30">
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{app.name}</p>
+                          <p className="text-sm text-muted-foreground truncate">{app.email}</p>
                         </div>
-                        <div className="flex gap-2 shrink-0">
+                        <div className="flex flex-wrap gap-2 shrink-0">
                           <Button
                             size="sm"
                             onClick={() => handleApprove(app.userId)}
                             disabled={processingId !== null}
                           >
-                            <Check className="w-4 h-4 mr-1" />
-                            Approve
+                            <Check className="w-4 h-4 mr-1 shrink-0" />
+                            {t("moderation.approve")}
                           </Button>
                           <Button
                             size="sm"
@@ -223,8 +225,8 @@ const Moderation = () => {
                             onClick={() => handleReject(app.userId)}
                             disabled={processingId !== null}
                           >
-                            <X className="w-4 h-4 mr-1" />
-                            Reject
+                            <X className="w-4 h-4 mr-1 shrink-0" />
+                            {t("moderation.reject")}
                           </Button>
                         </div>
                       </li>

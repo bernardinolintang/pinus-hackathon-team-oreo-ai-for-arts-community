@@ -1,0 +1,105 @@
+{
+  "common": {
+    "appName": "Atelier",
+    "signIn": "Masuk",
+    "signUp": "Daftar",
+    "logout": "Keluar",
+    "back": "Kembali",
+    "home": "Beranda",
+    "menu": "Menu",
+    "search": "Cari",
+    "loading": "Memuat",
+    "tryAgain": "Coba lagi",
+    "clearFilters": "Hapus filter"
+  },
+  "nav": {
+    "discover": "Jelajahi",
+    "artists": "Artis",
+    "collections": "Koleksi",
+    "trending": "Trending",
+    "becomeArtist": "Jadi Artis",
+    "profile": "Profil",
+    "favorites": "Favorit",
+    "settings": "Pengaturan",
+    "moderation": "Moderasi"
+  },
+  "hero": {
+    "badge": "Penemuan Berbasis Komunitas",
+    "title": "Temukan Seni Melalui",
+    "titleHighlight": "Koneksi Terpercaya",
+    "subtitle": "Komunitas tempat apresiasi seni lahir dari hubungan sejati, bukan algoritma. Jelajahi karya dan lihat bagaimana rekan berinteraksi dengannya.",
+    "trust1Title": "Artis Terverifikasi",
+    "trust1Desc": "Moderator manusia memastikan keaslian sebelum artis menerbitkan",
+    "trust2Title": "Validasi Rekan",
+    "trust2Desc": "Lihat apa yang dihargai koneksi terpercaya, bukan sekadar jumlah popularitas",
+    "trust3Title": "Penemuan Organik",
+    "trust3Desc": "Rekomendasi dijelaskan oleh relasi, bukan skor buram",
+    "scrollHint": "Gulir untuk menjelajahi",
+    "cta": "Mulai Jelajahi",
+    "ctaHeading": "Suka yang Anda lihat?",
+    "ctaSubtitle": "Masuk ke pasar lengkap untuk menjelajahi ratusan karya dan mengikuti artis yang menginspirasi Anda."
+  },
+  "login": {
+    "title": "Selamat datang kembali",
+    "description": "Masuk ke akun Anda untuk melanjutkan",
+    "email": "Email",
+    "password": "Kata sandi",
+    "submit": "Masuk",
+    "signingIn": "Memproses masuk...",
+    "noAccount": "Belum punya akun?",
+    "demoHint": "Coba demo (untuk juri)",
+    "demoCreds": "demo@email.com / demo",
+    "demoDesc": "Membuka alur moderator: setujui permohonan artis di halaman Moderasi."
+  },
+  "moderation": {
+    "title": "Moderasi",
+    "description": "Pelajari bagaimana konten ditinjau dan bagaimana kami menangani laporan dari komunitas. Moderasi etis menjaga Atelier sebagai tempat interaksi bermakna dan kepercayaan.",
+    "demoBlock": "Permohonan artis ditinjau oleh tim moderasi. Juri: masuk dengan akun demo moderator (demo@email.com / demo) untuk mencoba menyetujui permohonan.",
+    "signInModerator": "Masuk sebagai moderator",
+    "artistApplications": "Permohonan artis",
+    "artistApplicationsDesc": "Setujui atau tolak permintaan pengguna yang ingin mendaftar sebagai artis. Pengguna yang disetujui dapat memposting karya dan melihat siapa yang menyukai dan mengomentari.",
+    "noPending": "Tidak ada permohonan artis tertunda.",
+    "approve": "Setujui",
+    "reject": "Tolak"
+  },
+  "discover": {
+    "title": "Jelajahi Seni",
+    "subtitle": "Jelajahi karya yang divalidasi oleh rekan dan komunitas. Setiap karya dilengkapi konteks mengapa karya itu resonan.",
+    "noResults": "Tidak ada karya ditemukan",
+    "noResultsHint": "Coba ubah filter atau kata pencarian",
+    "clearAllFilters": "Hapus semua filter"
+  },
+  "artists": {
+    "title": "Artis",
+    "subtitle": "Jelajahi artis terverifikasi. Semua telah ditinjau moderator. Reputasi tumbuh melalui pengakuan rekan dan kualitas konsisten.",
+    "humanVerified": "Diverifikasi manusia",
+    "noMatch": "Tidak ada artis yang cocok dengan filter Anda",
+    "noMatchHint": "Coba istilah pencarian lain atau hapus filter untuk melihat semua artis terverifikasi.",
+    "viewAll": "Lihat semua artis"
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Halaman tidak ditemukan",
+    "description": "Halaman yang Anda cari tidak ada atau telah dipindahkan.",
+    "home": "Kembali ke Beranda",
+    "discover": "Jelajahi",
+    "artists": "Artis"
+  },
+  "footer": {
+    "tagline": "Platform seni berbasis komunitas yang dibangun atas kepercayaan, transparansi, dan apresiasi tulus.",
+    "communityTrust": "Komunitas & Kepercayaan",
+    "community": "Komunitas",
+    "guidelines": "Panduan",
+    "trust": "Kepercayaan & Keamanan",
+    "moderation": "Moderasi",
+    "contact": "Kontak",
+    "faq": "FAQ",
+    "about": "Tentang",
+    "ourMission": "Misi Kami",
+    "principles": "Prinsip Etis",
+    "privacy": "Privasi",
+    "terms": "Ketentuan",
+    "cookies": "Cookie",
+    "copyright": "© 2026 Atelier. Membangun kepercayaan di komunitas seni."
+  }
+}

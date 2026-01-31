@@ -1,0 +1,105 @@
+{
+  "common": {
+    "appName": "Atelier",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "logout": "Log out",
+    "back": "Back",
+    "home": "Home",
+    "menu": "Menu",
+    "search": "Search",
+    "loading": "Loading",
+    "tryAgain": "Try again",
+    "clearFilters": "Clear filters"
+  },
+  "nav": {
+    "discover": "Discover",
+    "artists": "Artists",
+    "collections": "Collections",
+    "trending": "Trending",
+    "becomeArtist": "Become an Artist",
+    "profile": "Profile",
+    "favorites": "Favorites",
+    "settings": "Settings",
+    "moderation": "Moderation"
+  },
+  "hero": {
+    "badge": "Community-Driven Discovery",
+    "title": "Discover Art Through",
+    "titleHighlight": "Trusted Connections",
+    "subtitle": "A community where art appreciation emerges from genuine peer relationships, not algorithms. Explore artworks in depth and see how peers interact with them.",
+    "trust1Title": "Verified Artists",
+    "trust1Desc": "Human moderators ensure authenticity before artists can publish",
+    "trust2Title": "Peer Validation",
+    "trust2Desc": "See what trusted connections appreciate, not just popularity counts",
+    "trust3Title": "Organic Discovery",
+    "trust3Desc": "Recommendations explained by relationships, not opaque scores",
+    "scrollHint": "Scroll to explore",
+    "cta": "Start Exploring",
+    "ctaHeading": "Loved what you see?",
+    "ctaSubtitle": "Dive into the full marketplace to explore hundreds of pieces and follow the artists that inspire you most."
+  },
+  "login": {
+    "title": "Welcome back",
+    "description": "Sign in to your account to continue",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "signingIn": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "demoHint": "Try demo (for judges)",
+    "demoCreds": "demo@email.com / demo",
+    "demoDesc": "Unlocks moderator flow: approve artist applications on the Moderation page."
+  },
+  "moderation": {
+    "title": "Moderation",
+    "description": "Learn how content is reviewed and how we handle reports from the community. Ethical moderation helps keep Atelier a place for meaningful interaction and trust.",
+    "demoBlock": "Artist applications are reviewed by the moderation team. Judges: sign in with the demo moderator account (demo@email.com / demo) to try approving applications.",
+    "signInModerator": "Sign in as moderator",
+    "artistApplications": "Artist applications",
+    "artistApplicationsDesc": "Approve or reject requests from users who want to register as artists. Approved users can post artworks and see who liked and commented on their work.",
+    "noPending": "No pending artist applications.",
+    "approve": "Approve",
+    "reject": "Reject"
+  },
+  "discover": {
+    "title": "Discover Art",
+    "subtitle": "Explore artworks validated by your peers and the wider community. Every piece comes with context about why it resonates.",
+    "noResults": "No artworks found",
+    "noResultsHint": "Try adjusting your filters or search terms",
+    "clearAllFilters": "Clear all filters"
+  },
+  "artists": {
+    "title": "Artists",
+    "subtitle": "Browse verified artists. Everyone here has been reviewed by moderators. Reputation grows through peer recognition and consistent quality.",
+    "humanVerified": "Human-verified",
+    "noMatch": "No artists match your filters",
+    "noMatchHint": "Try different search terms or clear filters to see all verified artists.",
+    "viewAll": "View all artists"
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "home": "Return to Home",
+    "discover": "Discover",
+    "artists": "Artists"
+  },
+  "footer": {
+    "tagline": "A community-driven art platform built on trust, transparency, and genuine appreciation.",
+    "communityTrust": "Community & Trust",
+    "community": "Community",
+    "guidelines": "Guidelines",
+    "trust": "Trust & Safety",
+    "moderation": "Moderation",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "about": "About",
+    "ourMission": "Our Mission",
+    "principles": "Ethical Principles",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "copyright": "© 2026 Atelier. Building trust in art communities."
+  }
+}

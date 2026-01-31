@@ -1,0 +1,105 @@
+{
+  "common": {
+    "appName": "Atelier",
+    "signIn": "登录",
+    "signUp": "注册",
+    "logout": "退出",
+    "back": "返回",
+    "home": "首页",
+    "menu": "菜单",
+    "search": "搜索",
+    "loading": "加载中",
+    "tryAgain": "重试",
+    "clearFilters": "清除筛选"
+  },
+  "nav": {
+    "discover": "发现",
+    "artists": "艺术家",
+    "collections": "收藏集",
+    "trending": "热门",
+    "becomeArtist": "成为艺术家",
+    "profile": "个人资料",
+    "favorites": "收藏",
+    "settings": "设置",
+    "moderation": "审核"
+  },
+  "hero": {
+    "badge": "社区驱动发现",
+    "title": "发现艺术通过",
+    "titleHighlight": "可信连接",
+    "subtitle": "在这里，艺术欣赏来自真实的同好关系，而非算法。深入探索作品，看看同好如何与艺术互动。",
+    "trust1Title": "认证艺术家",
+    "trust1Desc": "人工审核确保艺术家发布前真实可信",
+    "trust2Title": "同好验证",
+    "trust2Desc": "看到可信同好的喜好，而不只是人气数字",
+    "trust3Title": "自然发现",
+    "trust3Desc": "推荐基于关系解释，而非不透明分数",
+    "scrollHint": "向下滚动探索",
+    "cta": "开始探索",
+    "ctaHeading": "喜欢所见？",
+    "ctaSubtitle": "进入完整市集，探索更多作品并关注启发你的艺术家。"
+  },
+  "login": {
+    "title": "欢迎回来",
+    "description": "登录您的账户以继续",
+    "email": "邮箱",
+    "password": "密码",
+    "submit": "登录",
+    "signingIn": "登录中...",
+    "noAccount": "还没有账户？",
+    "demoHint": "评委试用",
+    "demoCreds": "demo@email.com / demo",
+    "demoDesc": "可体验审核流程：在审核页面批准艺术家申请。"
+  },
+  "moderation": {
+    "title": "审核",
+    "description": "了解我们如何审核内容和处理社区举报。合规审核让 Atelier 保持有意义的互动与信任。",
+    "demoBlock": "艺术家申请由审核团队处理。评委：使用演示审核账户（demo@email.com / demo）登录即可体验批准流程。",
+    "signInModerator": "以审核员身份登录",
+    "artistApplications": "艺术家申请",
+    "artistApplicationsDesc": "批准或拒绝用户成为艺术家的请求。获准用户可发布作品并查看点赞与评论。",
+    "noPending": "暂无待处理申请。",
+    "approve": "批准",
+    "reject": "拒绝"
+  },
+  "discover": {
+    "title": "发现艺术",
+    "subtitle": "探索经同好与社区验证的作品，每件作品都带有为何打动人心的说明。",
+    "noResults": "未找到作品",
+    "noResultsHint": "试试调整筛选或搜索词",
+    "clearAllFilters": "清除所有筛选"
+  },
+  "artists": {
+    "title": "艺术家",
+    "subtitle": "浏览认证艺术家，均经审核。声誉来自同好认可与稳定质量。",
+    "humanVerified": "人工认证",
+    "noMatch": "没有符合筛选的艺术家",
+    "noMatchHint": "换用搜索词或清除筛选以查看全部认证艺术家。",
+    "viewAll": "查看全部艺术家"
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "页面未找到",
+    "description": "您访问的页面不存在或已移动。",
+    "home": "返回首页",
+    "discover": "发现",
+    "artists": "艺术家"
+  },
+  "footer": {
+    "tagline": "基于信任、透明与真诚欣赏的社区艺术平台。",
+    "communityTrust": "社区与信任",
+    "community": "社区",
+    "guidelines": "指南",
+    "trust": "信任与安全",
+    "moderation": "审核",
+    "contact": "联系",
+    "faq": "常见问题",
+    "about": "关于",
+    "ourMission": "我们的使命",
+    "principles": "伦理原则",
+    "privacy": "隐私",
+    "terms": "条款",
+    "cookies": "Cookie",
+    "copyright": "© 2026 Atelier. 共建艺术社区信任。"
+  }
+}

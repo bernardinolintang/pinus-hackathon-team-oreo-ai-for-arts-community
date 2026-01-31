@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import Header from "@/components/Header";
 import { getUserMessage } from "@/lib/errors";
 
 const Login = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,16 +36,16 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="fixed inset-0 bg-background z-40 flex items-center justify-center pt-16 pb-16 px-6">
-        <Card className="w-full max-w-md relative z-50">
+      <div className="fixed inset-0 bg-background z-40 flex items-center justify-center pt-16 pb-16 px-4 sm:px-6 overflow-y-auto">
+        <Card className="w-full max-w-md relative z-50 my-auto">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-serif">Welcome back</CardTitle>
-            <CardDescription>Sign in to your account to continue</CardDescription>
+            <CardTitle className="text-xl sm:text-2xl font-serif">{t("login.title")}</CardTitle>
+            <CardDescription>{t("login.description")}</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("login.email")}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -55,7 +57,7 @@ const Login = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("login.password")}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -69,18 +71,18 @@ const Login = () => {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button type="submit" className="w-full" disabled={loading} aria-busy={loading}>
-                {loading ? "Signing in..." : "Sign in"}
+                {loading ? t("login.signingIn") : t("login.submit")}
               </Button>
               <p className="text-sm text-center text-muted-foreground">
-                Don't have an account?{" "}
+                {t("login.noAccount")}{" "}
                 <Link to="/signup" className="text-primary hover:underline">
-                  Sign up
+                  {t("common.signUp")}
                 </Link>
               </p>
               <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-center">
-                <p className="text-xs font-medium text-muted-foreground mb-1">Try demo (for judges)</p>
-                <p className="text-sm text-foreground font-mono">demo@email.com / demo</p>
-                <p className="text-xs text-muted-foreground mt-1">Unlocks moderator flow: approve artist applications on the Moderation page.</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">{t("login.demoHint")}</p>
+                <p className="text-sm text-foreground font-mono">{t("login.demoCreds")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t("login.demoDesc")}</p>
               </div>
             </CardFooter>
           </form>
