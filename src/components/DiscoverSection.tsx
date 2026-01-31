@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import ArtworkCard from "./ArtworkCard";
 
 const artworks = [
@@ -80,6 +81,7 @@ const artworks = [
 ];
 
 const DiscoverSection = () => {
+  const { t } = useTranslation();
   return (
     <section id="home-discover-section" className="py-24 bg-background">
       <div className="container mx-auto px-6">
@@ -91,11 +93,10 @@ const DiscoverSection = () => {
           className="max-w-2xl mb-12"
         >
           <h2 className="font-serif text-4xl font-semibold mb-4">
-            Discover Through Trust
+            {t("discover.sectionTitle")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Artworks validated by your peers and the wider community. 
-            Every piece comes with context about why it resonates.
+            {t("discover.description")}
           </p>
         </motion.div>
 

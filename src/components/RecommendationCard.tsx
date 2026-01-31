@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Lightbulb, ArrowRight } from "lucide-react";
 
 interface RecommendationCardProps {
@@ -17,6 +18,7 @@ const RecommendationCard = ({
   artworks,
   delay = 0,
 }: RecommendationCardProps) => {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -51,7 +53,7 @@ const RecommendationCard = ({
       </div>
 
       <button className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
-        Explore this collection
+        {t("recommendation.exploreCollection")}
         <ArrowRight className="w-4 h-4" />
       </button>
     </motion.div>

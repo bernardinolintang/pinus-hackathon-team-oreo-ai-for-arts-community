@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Star, Users, Award } from "lucide-react";
 
 interface ArtistCardProps {
@@ -25,6 +26,7 @@ const ArtistCard = ({
   recentWork,
   delay = 0,
 }: ArtistCardProps) => {
+  const { t } = useTranslation();
   const reputationColors = {
     established: "trust-badge",
     rising: "peer-badge",
@@ -32,9 +34,9 @@ const ArtistCard = ({
   };
 
   const reputationLabels = {
-    established: "Established Artist",
-    rising: "Rising Voice",
-    newcomer: "New Talent",
+    established: t("artists.reputationEstablished"),
+    rising: t("artists.reputationRising"),
+    newcomer: t("artists.reputationNewcomer"),
   };
 
   // Generate id from name if not provided
@@ -52,7 +54,7 @@ const ArtistCard = ({
       <div className="relative h-32 overflow-hidden">
         <img
           src={recentWork}
-          alt="Recent work"
+          alt={t("artists.recentWorkAlt")}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
@@ -84,11 +86,11 @@ const ArtistCard = ({
         <div className="flex items-center gap-6 mt-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <Users className="w-4 h-4" />
-            <span>{followers.toLocaleString()} followers</span>
+            <span>{followers.toLocaleString()} {t("artists.followers")}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Star className="w-4 h-4" />
-            <span>{peerEndorsements} endorsements</span>
+            <span>{peerEndorsements} {t("artists.endorsements")}</span>
           </div>
         </div>
       </div>

@@ -201,7 +201,7 @@ const Header = () => {
               >
                 <Link to="/artist/register" className="flex items-center gap-2">
                   <Palette className="w-4 h-4" />
-                  <span className="hidden sm:inline">Become an Artist</span>
+                  <span className="hidden sm:inline">{t("nav.becomeArtist")}</span>
                 </Link>
               </Button>
             )}

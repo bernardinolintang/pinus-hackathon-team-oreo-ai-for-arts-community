@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Heart, Bookmark, MessageCircle, Users, Star } from "lucide-react";
+import { Heart, Bookmark, Users, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -35,6 +36,7 @@ const ArtworkCard = ({
   keywords,
   delay = 0,
 }: ArtworkCardProps) => {
+  const { t } = useTranslation();
   const { user, isFavorite, toggleFavorite, isLiked, toggleLike } = useAuth();
   const isFav = isFavorite(artworkId);
   const liked = isLiked(artworkId);
@@ -45,15 +47,15 @@ const ArtworkCard = ({
     e.stopPropagation();
     
     if (!user) {
-      toast.error("Please sign in to save favorites");
+      toast.error(t("artworkCard.toastSignInFavorites"));
       return;
     }
 
     try {
       await toggleFavorite(artworkId, artistId);
-      toast.success(isFav ? "Removed from favorites" : "Saved to favorites");
+      toast.success(isFav ? t("artworkCard.toastRemovedFavorites") : t("artworkCard.toastSavedFavorites"));
     } catch (error) {
-      toast.error("Failed to update favorite");
+      toast.error(t("artworkCard.toastFailedFavorite"));
     }
   };
 
@@ -62,7 +64,7 @@ const ArtworkCard = ({
     e.stopPropagation();
     
     if (!user) {
-      toast.error("Please sign in to like artworks");
+      toast.error(t("artworkCard.toastSignInLike"));
       return;
     }
 
@@ -70,7 +72,7 @@ const ArtworkCard = ({
       await toggleLike(artworkId);
       setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
     } catch (error) {
-      toast.error("Failed to update like");
+      toast.error(t("artworkCard.toastFailedLike"));
     }
   };
   const trustColors = {
@@ -80,9 +82,9 @@ const ArtworkCard = ({
   };
 
   const trustLabels = {
-    high: "Highly Trusted",
-    medium: "Peer Validated",
-    emerging: "Emerging Voice",
+    high: t("artworkCard.trustHigh"),
+    medium: t("artworkCard.trustMedium"),
+    emerging: t("artworkCard.trustEmerging"),
   };
 
   return (
@@ -142,7 +144,7 @@ const ArtworkCard = ({
                   <Bookmark className={`w-5 h-5 transition-all ${isFav ? "fill-primary text-primary" : "text-primary"}`} />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>{isFav ? "Remove from favorites" : "Save to favorites"}</TooltipContent>
+              <TooltipContent>{isFav ? t("artworkCard.removeFavorites") : t("artworkCard.saveFavorites")}</TooltipContent>
             </Tooltip>
           </div>
         )}
@@ -186,7 +188,7 @@ const ArtworkCard = ({
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4" />
-            <span>{peerLikes} peers appreciate</span>
+            <span>{peerLikes} {t("artworkCard.peersAppreciate")}</span>
           </div>
           <div className="flex items-center gap-1">
             <Heart className={`w-4 h-4 ${liked ? "fill-red-500 text-red-500" : ""}`} />
@@ -199,9 +201,8 @@ const ArtworkCard = ({
           <div className="mt-4 pt-4 border-t border-border">
             <p className="text-xs text-muted-foreground text-center">
               <Link to="/login" className="text-primary hover:underline">
-                Sign in
-              </Link>{" "}
-              to like and save artworks
+                {t("artworkCard.signInToLike")}
+              </Link>
             </p>
           </div>
         )}

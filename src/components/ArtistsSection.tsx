@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import ArtistCard from "./ArtistCard";
 
 const artists = [
@@ -46,6 +47,7 @@ const artists = [
 ];
 
 const ArtistsSection = () => {
+  const { t } = useTranslation();
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-6">
@@ -58,18 +60,17 @@ const ArtistsSection = () => {
         >
           <div className="max-w-2xl">
             <h2 className="font-serif text-4xl font-semibold mb-4">
-              Verified Artists
+              {t("artists.sectionTitle")}
             </h2>
             <p className="text-lg text-muted-foreground">
-              Every artist is verified by human moderators before publishing. 
-              Reputation builds through consistent quality and peer recognition.
+              {t("artists.sectionDesc")}
             </p>
           </div>
           <Link 
             to="/artists" 
             className="text-sm font-medium text-primary hover:text-primary/80 transition-colors whitespace-nowrap"
           >
-            View all artists →
+            {t("artists.viewAllArrow")}
           </Link>
         </motion.div>
 

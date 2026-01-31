@@ -13,14 +13,19 @@ export const SUPPORTED_LANGUAGES = [
 
 export type SupportedLocale = (typeof SUPPORTED_LANGUAGES)[number]["code"];
 
-i18n
+export const i18nReady = i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: { en, zh, id },
+    resources: {
+      en: { translation: en },
+      zh: { translation: zh },
+      id: { translation: id },
+    },
     fallbackLng: "en",
     supportedLngs: ["en", "zh", "id"],
     interpolation: { escapeValue: false },
+    react: { useSuspense: true },
     detection: {
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],

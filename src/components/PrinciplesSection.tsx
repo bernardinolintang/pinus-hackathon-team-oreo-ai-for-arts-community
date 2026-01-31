@@ -1,30 +1,16 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Shield, Eye, Heart, Users } from "lucide-react";
 
-const principles = [
-  {
-    icon: Shield,
-    title: "AI Supports, Never Replaces",
-    description: "Our AI helps surface patterns and connections, but human judgement remains central. Trust emerges from real relationships.",
-  },
-  {
-    icon: Eye,
-    title: "Transparent by Design",
-    description: "Every recommendation and trust signal comes with an explanation. No opaque algorithms—you always know why.",
-  },
-  {
-    icon: Heart,
-    title: "Appreciation Over Speculation",
-    description: "We encourage learning and dialogue about art, not financial speculation. Value comes from meaning, not markets.",
-  },
-  {
-    icon: Users,
-    title: "Diverse Voices Matter",
-    description: "Our system actively preserves emerging and minority artistic voices, preventing any single group from dominating visibility.",
-  },
-];
+const principleKeys = [
+  { icon: Shield, titleKey: "principles.card1Title", descKey: "principles.card1Desc" },
+  { icon: Eye, titleKey: "principles.card2Title", descKey: "principles.card2Desc" },
+  { icon: Heart, titleKey: "principles.card3Title", descKey: "principles.card3Desc" },
+  { icon: Users, titleKey: "principles.card4Title", descKey: "principles.card4Desc" },
+] as const;
 
 const PrinciplesSection = () => {
+  const { t } = useTranslation();
   return (
     <section className="py-24 bg-primary/5">
       <div className="container mx-auto px-6">
@@ -36,16 +22,17 @@ const PrinciplesSection = () => {
           className="text-center max-w-2xl mx-auto mb-16"
         >
           <h2 className="font-serif text-4xl font-semibold mb-4">
-            Our Ethical Principles
+            {t("principles.sectionTitle")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            We believe art communities deserve better than engagement-maximizing algorithms. 
-            Here's what guides us.
+            {t("principles.sectionDesc")}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {principles.map((principle, index) => (
+          {principleKeys.map((principle, index) => {
+            const Icon = principle.icon;
+            return (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -55,14 +42,15 @@ const PrinciplesSection = () => {
               className="flex gap-5"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <principle.icon className="w-6 h-6 text-primary" />
+                <Icon className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-serif text-xl font-semibold mb-2">{principle.title}</h3>
-                <p className="text-muted-foreground">{principle.description}</p>
+                <h3 className="font-serif text-xl font-semibold mb-2">{t(principle.titleKey)}</h3>
+                <p className="text-muted-foreground">{t(principle.descKey)}</p>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
